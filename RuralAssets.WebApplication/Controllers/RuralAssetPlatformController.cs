@@ -1,7 +1,15 @@
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net.Http;
 using System.Text.Json;
 using System.Threading.Tasks;
+using AElf;
+using AElf.Client.Service;
+using AElf.Contracts.Assets;
+using AElf.Cryptography;
+using Google.Protobuf;
+using Google.Protobuf.WellKnownTypes;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -15,13 +23,16 @@ namespace RuralAssets.WebApplication.Controllers
     {
         private readonly ILogger<RuralAssetPlatformController> _logger;
         private readonly IValidationService _validationService;
+        private readonly AccountManager _accountManager;
         private readonly ConfigOptions _configOptions;
 
         public RuralAssetPlatformController(ILogger<RuralAssetPlatformController> logger,
-            IValidationService validationService, IOptionsSnapshot<ConfigOptions> configOptions)
+            IValidationService validationService, IOptionsSnapshot<ConfigOptions> configOptions,
+            AccountManager accountManager)
         {
             _logger = logger;
             _validationService = validationService;
+            _accountManager = accountManager;
             _configOptions = configOptions.Value;
         }
 
@@ -107,7 +118,7 @@ namespace RuralAssets.WebApplication.Controllers
                     Msg = MessageHelper.GetMessage(message)
                 };
             }
-            
+
             if (string.IsNullOrEmpty(input.IdCard) || string.IsNullOrEmpty(input.Name))
             {
                 message = MessageHelper.Message.ParameterMissed;
@@ -145,9 +156,69 @@ namespace RuralAssets.WebApplication.Controllers
         }
 
         [HttpPost("change_status")]
-        public Task<ResponseDto> ChangeStatusAsync(ChangeStatusInput input)
+        public async Task<ResponseDto> ChangeStatusAsync(ChangeStatusInput input)
         {
-            throw new System.NotImplementedException();
+            MessageHelper.Message message;
+            if (!_validationService.ValidateIdCard(input.IdCard))
+            {
+                message = MessageHelper.Message.WrongIdCard;
+                return new ResponseDto
+                {
+                    Code = MessageHelper.GetCode(message),
+                    Msg = MessageHelper.GetMessage(message)
+                };
+            }
+
+            if (string.IsNullOrEmpty(input.IdCard) || string.IsNullOrEmpty(input.Name) || !input.AssetList.Any() ||
+                (input.AssetType != 1 && input.AssetType != 2))
+            {
+                message = MessageHelper.Message.ParameterMissed;
+                return new ResponseDto
+                {
+                    Code = MessageHelper.GetCode(message),
+                    Msg = MessageHelper.GetMessage(message)
+                };
+            }
+
+            var nodeManager = new NodeManager(_configOptions.BlockChainEndpoint);
+            var txId = nodeManager.SendTransaction(_configOptions.AccountAddress, _configOptions.RuralContractAddress,
+                "SetAssetInfo", new AssetInfo
+                {
+                    Name = input.Name,
+                    IdCard = input.IdCard,
+                    AssetType = input.AssetType,
+                    AssetIdList = {input.AssetList.Select(a => a.AssetId)},
+                    AssetList =
+                    {
+                        input.AssetList.Select(a => new Asset
+                        {
+                            AssetId = a.AssetId,
+                            Status = a.Status,
+                            BankId = a.BankId,
+                            LoanAmount = DoubleToLong(a.LoanAmount),
+                            LoanAgreement = ByteString.CopyFrom(a.LoanAgreement),
+                            DueDate = Timestamp.FromDateTime(DateTime.Parse(a.DueDate)),
+                            LoanRate = DoubleToLong(a.LoanRate),
+                            IdCard = input.IdCard
+                        })
+                    }
+                });
+            var result = nodeManager.CheckTransactionResult(txId);
+
+            var sql = SqlStatementHelper.GetQueryCreditSql(input.Name, input.IdCard);
+            var row = await MySqlHelper.ExecuteNonQueryAsync(_configOptions.RuralAssetsConnectString, sql);
+            return new ResponseDto
+            {
+                Code = MessageHelper.GetCode(MessageHelper.Message.Success),
+                Msg = MessageHelper.GetMessage(MessageHelper.Message.Success),
+                Result = row > 0 ? "1" : "0",
+                Description = $"{(row > 0 ? "成功" : "失败")}\n交易Id：{txId}\n交易状态：{result.Status}"
+            };
+        }
+
+        private long DoubleToLong(double origin)
+        {
+            return (long) origin * 10000;
         }
 
         [HttpPost("list")]
@@ -298,17 +369,11 @@ namespace RuralAssets.WebApplication.Controllers
                 SFXX = dataReader[49]?.ToString() ?? string.Empty,
             };
         }
-        
+
         private int ParseToInt(MySqlDataReader dataReader, int index)
         {
             return int.Parse(
                 string.IsNullOrEmpty(dataReader[index]?.ToString()) ? "0" : dataReader[index].ToString());
-        }
-        
-        private int ParseToInt(MySqlDataReader dataReader, string column)
-        {
-            return int.Parse(
-                string.IsNullOrEmpty(dataReader[column]?.ToString()) ? "0" : dataReader[column].ToString());
         }
 
         private double ParseToDouble(MySqlDataReader dataReader, int index)

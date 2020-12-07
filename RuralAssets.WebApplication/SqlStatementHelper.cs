@@ -34,6 +34,18 @@ select a.skr as name,a.sfzh as idcard, 1 as asset_type,a.id as asset_id,concat_w
 ";
         }
 
+        public static string GetChangeStatusSql(string name, string idCard, int assetId, int status)
+        {
+            return $@"
+UPDATE entity_tdbchmc t 
+SET t.zczt = {status}       #更新资产状态
+WHERE
+	t.id = {assetId}        #资产ID	
+	AND t.skr = '{name}'  #姓名	
+	AND t.sfzh = '{idCard}' #身份证号
+";
+        }
+
         public static string GetListSql(string name, string idCard, int assetId, double bfzt, string lsx,
             string lsxz, string lsc)
         {

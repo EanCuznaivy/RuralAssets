@@ -1,12 +1,13 @@
 using System.Collections.Generic;
 using System.Text.Json.Serialization;
+using AElf.Contracts.Assets;
 
 namespace RuralAssets.WebApplication
 {
     public class ChangeStatusInput
     {
         [JsonPropertyName("name")] public string Name { get; set; }
-        [JsonPropertyName("idcard")] public string Idcard { get; set; }
+        [JsonPropertyName("idcard")] public string IdCard { get; set; }
         [JsonPropertyName("asset_type")] public int AssetType { get; set; }
         [JsonPropertyName("asset_list")] public List<AssetInChain> AssetList { get; set; }
     }
