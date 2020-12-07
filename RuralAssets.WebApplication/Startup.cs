@@ -44,6 +44,9 @@ namespace RuralAssets.WebApplication
                     options.CustomSchemaIds(type => type.FullName);
                 }
             );
+            
+            var configuration = services.GetConfiguration();
+            services.Configure<ConfigOptions>(configuration.GetSection("Config"));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

@@ -4,6 +4,7 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using MySql.Data.MySqlClient;
 
 namespace RuralAssets.WebApplication.Controllers
@@ -14,12 +15,14 @@ namespace RuralAssets.WebApplication.Controllers
     {
         private readonly ILogger<RuralAssetPlatformController> _logger;
         private readonly IValidationService _validationService;
+        private readonly ConfigOptions _configOptions;
 
         public RuralAssetPlatformController(ILogger<RuralAssetPlatformController> logger,
-            IValidationService validationService)
+            IValidationService validationService, IOptionsSnapshot<ConfigOptions> configOptions)
         {
             _logger = logger;
             _validationService = validationService;
+            _configOptions = configOptions.Value;
         }
 
         [HttpPost("check")]
@@ -59,7 +62,7 @@ namespace RuralAssets.WebApplication.Controllers
             message = MessageHelper.Message.Success;
             var sql = SqlStatementHelper.GetCheckSql(input.Name, input.IdCard, input.Year);
             var dataReader =
-                await MySqlHelper.ExecuteReaderAsync(RuralAssetPlatformConstants.RuralAssetConnectString, sql);
+                await MySqlHelper.ExecuteReaderAsync(_configOptions.RuralAssetsConnectString, sql);
             dataReader.Read();
             var result = dataReader[0].ToString();
             string description;
@@ -117,7 +120,7 @@ namespace RuralAssets.WebApplication.Controllers
 
             var sql = SqlStatementHelper.GetQueryCreditSql(input.Name, input.IdCard);
             var dataReader =
-                await MySqlHelper.ExecuteReaderAsync(RuralAssetPlatformConstants.RuralAssetConnectString, sql);
+                await MySqlHelper.ExecuteReaderAsync(_configOptions.RuralAssetsConnectString, sql);
             var assetRequestList = new List<AssetRequest>();
             while (dataReader.Read())
             {
@@ -135,7 +138,7 @@ namespace RuralAssets.WebApplication.Controllers
             };
             var options = new JsonSerializerOptions();
             var text = JsonSerializer.Serialize(request, options);
-            var responseMessage = await client.PostAsync("http://172.16.73.43:8010/api/v1.0/asset/credit",
+            var responseMessage = await client.PostAsync(_configOptions.CreditUri,
                 new StringContent(text));
             var response = await responseMessage.Content.ReadAsStringAsync();
             return JsonSerializer.Deserialize<QueryCreditResponseDto>(response);
@@ -182,7 +185,7 @@ namespace RuralAssets.WebApplication.Controllers
             var sql = SqlStatementHelper.GetListSql(input.Name, input.Idcard, input.AssetId, input.BFZT, input.LSX,
                 input.LSXZ, input.LSC);
             var dataReader =
-                await MySqlHelper.ExecuteReaderAsync(RuralAssetPlatformConstants.RuralAssetConnectString, sql);
+                await MySqlHelper.ExecuteReaderAsync(_configOptions.RuralAssetsConnectString, sql);
             while (dataReader.Read())
             {
                 response.List.Add(new AssetDto
@@ -237,7 +240,7 @@ namespace RuralAssets.WebApplication.Controllers
 
             var sql = SqlStatementHelper.GetDetailSql(input.Name, input.Idcard, input.AssetId);
             var dataReader =
-                await MySqlHelper.ExecuteReaderAsync(RuralAssetPlatformConstants.RuralAssetConnectString, sql);
+                await MySqlHelper.ExecuteReaderAsync(_configOptions.RuralAssetsConnectString, sql);
             dataReader.Read();
             return new DetailsResponseDto
             {
