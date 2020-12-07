@@ -47,6 +47,7 @@ namespace RuralAssets.WebApplication
             
             var configuration = services.GetConfiguration();
             services.Configure<ConfigOptions>(configuration.GetSection("Config"));
+            services.Configure<ApiAuthorizeOptions>(configuration.GetSection("ApiAuthorize"));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -54,6 +55,7 @@ namespace RuralAssets.WebApplication
         {
             var cultureInfo = CultureInfo.InvariantCulture;
             CultureInfo.DefaultThreadCurrentCulture = cultureInfo;
+            //app.UseMiddleware<SecurityMiddleware>();
             app.UseHttpsRedirection();
             app.UseRouting();
             app.UseAuthorization();

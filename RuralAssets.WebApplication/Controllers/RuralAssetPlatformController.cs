@@ -4,10 +4,7 @@ using System.Linq;
 using System.Net.Http;
 using System.Text.Json;
 using System.Threading.Tasks;
-using AElf;
-using AElf.Client.Service;
 using AElf.Contracts.Assets;
-using AElf.Cryptography;
 using Google.Protobuf;
 using Google.Protobuf.WellKnownTypes;
 using Microsoft.AspNetCore.Mvc;
@@ -23,16 +20,13 @@ namespace RuralAssets.WebApplication.Controllers
     {
         private readonly ILogger<RuralAssetPlatformController> _logger;
         private readonly IValidationService _validationService;
-        private readonly AccountManager _accountManager;
         private readonly ConfigOptions _configOptions;
 
         public RuralAssetPlatformController(ILogger<RuralAssetPlatformController> logger,
-            IValidationService validationService, IOptionsSnapshot<ConfigOptions> configOptions,
-            AccountManager accountManager)
+            IValidationService validationService, IOptionsSnapshot<ConfigOptions> configOptions)
         {
             _logger = logger;
             _validationService = validationService;
-            _accountManager = accountManager;
             _configOptions = configOptions.Value;
         }
 
