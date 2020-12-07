@@ -1,9 +1,11 @@
+using System.Text.Json.Serialization;
+
 namespace RuralAssets.WebApplication
 {
     public class QueryCreditInput
     {
-        public string Name { get; set; }
-        public string Idcard { get; set; }
-        public int AssetType { get; set; }
+        [JsonPropertyName("name")] public string Name { get; set; }
+        [JsonPropertyName("idcard")] public string IdCard { get; set; }
+        [JsonPropertyName("asset_type")] public int AssetType { get; set; }
     }
 }

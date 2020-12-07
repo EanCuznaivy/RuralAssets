@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Text.Json;
@@ -95,26 +94,51 @@ namespace RuralAssets.WebApplication.Controllers
         [HttpPost("query_credit")]
         public async Task<QueryCreditResponseDto> QueryCreditAsync(QueryCreditInput input)
         {
-            var response = new QueryCreditResponseDto();
-            var sql = SqlStatementHelper.GetQueryCreditSql(input.Name, input.Idcard);
+            MessageHelper.Message message;
+            if (!_validationService.ValidateIdCard(input.IdCard))
+            {
+                message = MessageHelper.Message.WrongIdCard;
+                return new QueryCreditResponseDto
+                {
+                    Code = MessageHelper.GetCode(message),
+                    Msg = MessageHelper.GetMessage(message)
+                };
+            }
+            
+            if (string.IsNullOrEmpty(input.IdCard) || string.IsNullOrEmpty(input.Name))
+            {
+                message = MessageHelper.Message.ParameterMissed;
+                return new QueryCreditResponseDto
+                {
+                    Code = MessageHelper.GetCode(message),
+                    Msg = MessageHelper.GetMessage(message)
+                };
+            }
+
+            var sql = SqlStatementHelper.GetQueryCreditSql(input.Name, input.IdCard);
+            var dataReader =
+                await MySqlHelper.ExecuteReaderAsync(RuralAssetPlatformConstants.RuralAssetConnectString, sql);
+            var assetRequestList = new List<AssetRequest>();
+            while (dataReader.Read())
+            {
+                assetRequestList.Add(new AssetRequest
+                {
+                    AssetId = ParseToInt(dataReader, 3),
+                    BCZJE = ParseToDouble(dataReader, 34)
+                });
+            }
+
             var client = new HttpClient();
             var request = new QueryCreditRequest
             {
-                AssetList = new List<AssetRequest>
-                {
-                    new AssetRequest
-                    {
-                        AssetId = 80486,
-                        BCZJE = 134850
-                    }
-                }
+                AssetList = assetRequestList
             };
             var options = new JsonSerializerOptions();
             var text = JsonSerializer.Serialize(request, options);
             var responseMessage = await client.PostAsync("http://172.16.73.43:8010/api/v1.0/asset/credit",
                 new StringContent(text));
-
-            return response;
+            var response = await responseMessage.Content.ReadAsStringAsync();
+            return JsonSerializer.Deserialize<QueryCreditResponseDto>(response);
         }
 
         [HttpPost("change_status")]
@@ -276,6 +300,12 @@ namespace RuralAssets.WebApplication.Controllers
         {
             return int.Parse(
                 string.IsNullOrEmpty(dataReader[index]?.ToString()) ? "0" : dataReader[index].ToString());
+        }
+        
+        private int ParseToInt(MySqlDataReader dataReader, string column)
+        {
+            return int.Parse(
+                string.IsNullOrEmpty(dataReader[column]?.ToString()) ? "0" : dataReader[column].ToString());
         }
 
         private double ParseToDouble(MySqlDataReader dataReader, int index)

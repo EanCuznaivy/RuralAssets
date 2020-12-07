@@ -6,6 +6,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OpenApi.Models;
 using Volo.Abp.AspNetCore;
+using Volo.Abp.AspNetCore.Mvc;
+using Volo.Abp.Http.Modeling;
 
 namespace RuralAssets.WebApplication
 {
@@ -23,6 +25,7 @@ namespace RuralAssets.WebApplication
         {
             services.AddApplication<AbpAspNetCoreModule>();
             services.AddSingleton<IValidationService, ValidationService>();
+            services.AddTransient<IApiDescriptionModelProvider, AspNetCoreApiDescriptionModelProvider>();
             services.AddControllers();
             services.AddApiVersioning(options =>
             {
@@ -53,7 +56,6 @@ namespace RuralAssets.WebApplication
             app.UseAuthorization();
             app.UseEndpoints(endpoints => { endpoints.MapControllers(); });
             app.InitializeApplication();
-            app.UseRouting();
             app.UseSwagger();
             app.UseSwaggerUI(options => { options.SwaggerEndpoint("/swagger/v1/swagger.json", "AssetPlatform API"); });
             app.UseConfiguredEndpoints();

@@ -13,6 +13,6 @@ namespace RuralAssets.WebApplication
     public class AssetRequest
     {
         [JsonPropertyName("asset_id")] public int AssetId { get; set; }
-        [JsonPropertyName("bczje")] public int BCZJE { get; set; }
+        [JsonPropertyName("bczje")] public double BCZJE { get; set; }
     }
 }

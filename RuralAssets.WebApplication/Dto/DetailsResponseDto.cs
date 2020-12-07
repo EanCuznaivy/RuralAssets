@@ -1,26 +1,35 @@
+using System.Text.Json.Serialization;
+
 namespace RuralAssets.WebApplication
 {
     public class DetailsResponseDto
     {
+        [JsonPropertyName("code")]
         public string Code { get; set; }
+        [JsonPropertyName("msg")]
         public string Msg { get; set; }
+        [JsonPropertyName("asset_id")]
         public int AssetId { get; set; }
 
         /// <summary>
         /// 数字证书唯一标识
         /// </summary>
+        [JsonPropertyName("block_id")]
         public string BlockId { get; set; }
 
+        [JsonPropertyName("id")]
         public double Id { get; set; }
 
         /// <summary>
         /// 姓名（收款人）
         /// </summary>
+        [JsonPropertyName("skr")]
         public string SKR { get; set; }
 
         /// <summary>
         /// 身份证号
         /// </summary>
+        [JsonPropertyName("sfzh")]
         public string SFZH { get; set; }
 
         /// <summary>
