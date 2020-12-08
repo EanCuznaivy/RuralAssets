@@ -7,6 +7,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OpenApi.Models;
 using Volo.Abp.AspNetCore;
 using Volo.Abp.AspNetCore.Mvc;
+using Volo.Abp.Caching;
 using Volo.Abp.Http.Modeling;
 
 namespace RuralAssets.WebApplication
@@ -23,8 +24,14 @@ namespace RuralAssets.WebApplication
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            var configuration = services.GetConfiguration();
+
             services.AddApplication<AbpAspNetCoreModule>();
             services.AddSingleton<IValidationService, ValidationService>();
+            services.AddSingleton<IDistributedCacheSerializer, Utf8JsonDistributedCacheSerializer>();
+            services.AddSingleton<IDistributedCacheKeyNormalizer, DistributedCacheKeyNormalizer>();
+            services.AddSingleton(typeof(IDistributedCache<>), typeof(DistributedCache<>));
+            services.AddSingleton<NonceCache>();
             services.AddTransient<IApiDescriptionModelProvider, AspNetCoreApiDescriptionModelProvider>();
             services.AddControllers();
             services.AddApiVersioning(options =>
@@ -44,10 +51,18 @@ namespace RuralAssets.WebApplication
                     options.CustomSchemaIds(type => type.FullName);
                 }
             );
-            
-            var configuration = services.GetConfiguration();
+
             services.Configure<ConfigOptions>(configuration.GetSection("Config"));
             services.Configure<ApiAuthorizeOptions>(configuration.GetSection("ApiAuthorize"));
+            services.Configure<ModuleConfigOptions>(options =>
+            {
+                options.EnableAuthorization = configuration.GetValue<bool>("EnableAuthorization");
+            });
+
+            if (configuration.GetValue<bool>("EnableAuthorization"))
+            {
+                services.AddMvc(mvc => mvc.Filters.Add<AuthorizeFilter>());
+            }
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -55,7 +70,6 @@ namespace RuralAssets.WebApplication
         {
             var cultureInfo = CultureInfo.InvariantCulture;
             CultureInfo.DefaultThreadCurrentCulture = cultureInfo;
-            //app.UseMiddleware<SecurityMiddleware>();
             app.UseHttpsRedirection();
             app.UseRouting();
             app.UseAuthorization();
@@ -64,6 +78,7 @@ namespace RuralAssets.WebApplication
             app.UseSwagger();
             app.UseSwaggerUI(options => { options.SwaggerEndpoint("/swagger/v1/swagger.json", "AssetPlatform API"); });
             app.UseConfiguredEndpoints();
+            //app.UseMiddleware<SecurityMiddleware>();
         }
     }
 }

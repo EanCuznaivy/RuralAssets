@@ -15,7 +15,6 @@ using Volo.Abp.Threading;
 using Volo.Abp.Caching;
 using Volo.Abp.Json;
 
-
 namespace RuralAssets.WebApplication
 {
     public class AuthorizeFilter : IAuthorizationFilter
@@ -44,7 +43,7 @@ namespace RuralAssets.WebApplication
             string requestBody;
             using (var stream = new StreamReader(request.Body))
             {
-                stream.BaseStream.Position = 0;
+                //stream.BaseStream.Position = 0;
                 requestBody = AsyncHelper.RunSync(stream.ReadToEndAsync);
             }
 
@@ -52,7 +51,12 @@ namespace RuralAssets.WebApplication
                 requestBody);
             if (!verifyResult)
             {
-                context.Result = new UnauthorizedResult();
+                var message = MessageHelper.Message.AuthorizeFailed;
+                context.Result = new JsonResult(new ResponseDto
+                {
+                    Code = MessageHelper.GetCode(message),
+                    Msg = MessageHelper.GetMessage(message)
+                });
             }
         }
 

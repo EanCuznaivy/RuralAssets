@@ -10,7 +10,8 @@ namespace RuralAssets.WebApplication
             WrongIdCard,
             ParameterMissed,
             ParameterTypeNotMatch,
-            Unsupport
+            Unsupport,
+            AuthorizeFailed
         }
 
         public static string GetCode(Message message)
@@ -31,6 +32,9 @@ namespace RuralAssets.WebApplication
 
                 case Message.Unsupport:
                     return "0005";
+
+                case Message.AuthorizeFailed:
+                    return "0006";
 
                 default:
                     return "0001";
@@ -55,6 +59,9 @@ namespace RuralAssets.WebApplication
 
                 case Message.Unsupport:
                     return "不支持该请求方式";
+
+                case Message.AuthorizeFailed:
+                    return "验签失败";
 
                 default:
                     return "系统异常（其他所有未列出的异常）";
