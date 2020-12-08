@@ -4,15 +4,16 @@ namespace RuralAssets.WebApplication
 {
     public class ListInput
     {
-        public string Name { get; set; }
-        public string Idcard { get; set; }
-        
-        [JsonPropertyName("asset_type")]
-        public int AssetType { get; set; }
+        [JsonPropertyName("name")] public string Name { get; set; }
+
+        [JsonPropertyName("idcard")] public string IdCard { get; set; }
+
+        [JsonPropertyName("asset_type")] public int AssetType { get; set; }
 
         /// <summary>
         /// 资产Id
         /// </summary>
+        [JsonPropertyName("asset_id")]
         public int AssetId { get; set; }
 
         /// <summary>
@@ -23,21 +24,25 @@ namespace RuralAssets.WebApplication
         /// 4 - 未发放
         /// 5 - 撤销成功
         /// </summary>
+        [JsonPropertyName("bfzt")]
         public double BFZT { get; set; }
 
         /// <summary>
         /// 隶属县编码
         /// </summary>
+        [JsonPropertyName("lsx")]
         public string LSX { get; set; }
 
         /// <summary>
         /// 隶属乡镇编码
         /// </summary>
+        [JsonPropertyName("lsxz")]
         public string LSXZ { get; set; }
 
         /// <summary>
         /// 隶属村编码
         /// </summary>
+        [JsonPropertyName("lsc")]
         public string LSC { get; set; }
     }
 }

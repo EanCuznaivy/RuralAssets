@@ -18,8 +18,11 @@ WHERE
   t.sfsc = 2
  AND t.skr = '{name}' 
  AND t.sfzh = '{idCard}'
- AND (CAST(LEFT( t.cjsj, 4) as SIGNED) = {year} or CAST(LEFT( t.cjsj, 4) as SIGNED)+1 = {year})
-";
+" +
+                   (string.IsNullOrEmpty(year)
+                       ? ""
+                       : $"AND (CAST(LEFT( t.cjsj, 4) as SIGNED) = {year} or CAST(LEFT( t.cjsj, 4) as SIGNED)+1 = {year})"
+                   );
         }
 
         public static string GetQueryCreditSql(string name, string idCard)
@@ -84,7 +87,8 @@ select
                        : $" and a.lsxzid = {lsxz}") +
                    (string.IsNullOrEmpty(lsc)
                        ? ""
-                       : $" and a.lsc = {lsc}");
+                       : $" and a.lsc = {lsc}") +
+                   " order by a.id asc limit 0,100";
         }
 
         public static string GetDetailSql(string name, string idCard, int assetId)

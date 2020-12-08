@@ -27,7 +27,7 @@ namespace RuralAssets.WebApplication
             var configuration = services.GetConfiguration();
 
             services.AddApplication<AbpAspNetCoreModule>();
-            services.AddSingleton<IValidationService, ValidationService>();
+            services.AddTransient<IValidationService, ValidationService>();
             services.AddSingleton<IDistributedCacheSerializer, Utf8JsonDistributedCacheSerializer>();
             services.AddSingleton<IDistributedCacheKeyNormalizer, DistributedCacheKeyNormalizer>();
             services.AddSingleton(typeof(IDistributedCache<>), typeof(DistributedCache<>));
@@ -57,6 +57,7 @@ namespace RuralAssets.WebApplication
             services.Configure<ModuleConfigOptions>(options =>
             {
                 options.EnableAuthorization = configuration.GetValue<bool>("EnableAuthorization");
+                options.EnableIdCardCheck = configuration.GetValue<bool>("EnableIdCardCheck");
             });
 
             if (configuration.GetValue<bool>("EnableAuthorization"))

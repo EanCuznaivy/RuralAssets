@@ -6,7 +6,7 @@ namespace RuralAssets.WebApplication
     public class QueryCreditRequest
     {
         [JsonPropertyName("name")] public string Name { get; set; }
-        [JsonPropertyName("idcard")] public string Idcard { get; set; }
+        [JsonPropertyName("idcard")] public string IdCard { get; set; }
         [JsonPropertyName("asset_list")] public List<AssetRequest> AssetList { get; set; }
     }
 

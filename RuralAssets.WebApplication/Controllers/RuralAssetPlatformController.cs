@@ -139,13 +139,19 @@ namespace RuralAssets.WebApplication.Controllers
             var client = new HttpClient();
             var request = new QueryCreditRequest
             {
+                Name = input.Name,
+                IdCard = input.IdCard,
                 AssetList = assetRequestList
             };
             var options = new JsonSerializerOptions();
             var text = JsonSerializer.Serialize(request, options);
+            _logger.LogInformation(text);
+
             var responseMessage = await client.PostAsync(_configOptions.CreditUri,
                 new StringContent(text));
             var response = await responseMessage.Content.ReadAsStringAsync();
+            _logger.LogInformation(text);
+
             return JsonSerializer.Deserialize<QueryCreditResponseDto>(response);
         }
 
@@ -199,14 +205,37 @@ namespace RuralAssets.WebApplication.Controllers
                 });
             var result = nodeManager.CheckTransactionResult(txId);
 
-            var sql = SqlStatementHelper.GetQueryCreditSql(input.Name, input.IdCard);
-            var row = await MySqlHelper.ExecuteNonQueryAsync(_configOptions.RuralAssetsConnectString, sql);
+            var success = true;
+            foreach (var assetInChain in input.AssetList)
+            {
+                var status = 1;
+                switch (assetInChain.Status)
+                {
+                    case "冻结":
+                        status = 1;
+                        break;
+                    case "逾期":
+                        status = 2;
+                        break;
+                    case "正常":
+                        status = 3;
+                        break;
+                }
+
+                var sql = SqlStatementHelper.GetChangeStatusSql(input.Name, input.IdCard, assetInChain.AssetId, status);
+                var row = await MySqlHelper.ExecuteNonQueryAsync(_configOptions.RuralAssetsConnectString, sql);
+                if (row == 0)
+                {
+                    success = false;
+                }
+            }
+
             return new ResponseDto
             {
                 Code = MessageHelper.GetCode(MessageHelper.Message.Success),
                 Msg = MessageHelper.GetMessage(MessageHelper.Message.Success),
-                Result = row > 0 ? "1" : "0",
-                Description = $"{(row > 0 ? "成功" : "失败")}\n交易Id：{txId}\n交易状态：{result.Status}"
+                Result = success ? "1" : "0",
+                Description = $"{(success ? "成功" : "失败")}\n交易Id：{txId}\n交易状态：{result.Status}"
             };
         }
 
@@ -219,7 +248,7 @@ namespace RuralAssets.WebApplication.Controllers
         public async Task<ListResponseDto> ListAsync(ListInput input)
         {
             var message = MessageHelper.Message.Success;
-            if (!string.IsNullOrEmpty(input.Idcard) && !_validationService.ValidateIdCard(input.Idcard))
+            if (!string.IsNullOrEmpty(input.IdCard) && !_validationService.ValidateIdCard(input.IdCard))
             {
                 message = MessageHelper.Message.WrongIdCard;
                 return new ListResponseDto
@@ -247,7 +276,7 @@ namespace RuralAssets.WebApplication.Controllers
                 Msg = MessageHelper.GetMessage(message),
                 List = new List<AssetDto>()
             };
-            var sql = SqlStatementHelper.GetListSql(input.Name, input.Idcard, input.AssetId, input.BFZT, input.LSX,
+            var sql = SqlStatementHelper.GetListSql(input.Name, input.IdCard, input.AssetId, input.BFZT, input.LSX,
                 input.LSXZ, input.LSC);
             var dataReader =
                 await MySqlHelper.ExecuteReaderAsync(_configOptions.RuralAssetsConnectString, sql);

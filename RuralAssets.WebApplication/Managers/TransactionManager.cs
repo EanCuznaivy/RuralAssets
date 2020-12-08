@@ -33,7 +33,7 @@ namespace RuralAssets.WebApplication
 
                 return transaction;
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 return null;
             }
