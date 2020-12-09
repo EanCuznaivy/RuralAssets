@@ -7,6 +7,6 @@ namespace RuralAssets.WebApplication
         [JsonPropertyName("code")] public string Code { get; set; }
         [JsonPropertyName("msg")] public string Msg { get; set; }
         [JsonPropertyName("result")] public string Result { get; set; }
-        [JsonPropertyName("credit")] public string Credit { get; set; }
+        [JsonPropertyName("credit")] public double Credit { get; set; }
     }
 }

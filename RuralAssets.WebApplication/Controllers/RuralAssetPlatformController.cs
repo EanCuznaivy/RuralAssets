@@ -2,7 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Text.Json;
+using System.Text.Unicode;
 using System.Threading.Tasks;
 using AElf.Contracts.Assets;
 using Google.Protobuf;
@@ -143,16 +145,26 @@ namespace RuralAssets.WebApplication.Controllers
                 IdCard = input.IdCard,
                 AssetList = assetRequestList
             };
-            var options = new JsonSerializerOptions();
+            var options = new JsonSerializerOptions
+            {
+                Encoder = System.Text.Encodings.Web.JavaScriptEncoder.Create(UnicodeRanges.All)
+            };
             var text = JsonSerializer.Serialize(request, options);
             _logger.LogInformation(text);
 
-            var responseMessage = await client.PostAsync(_configOptions.CreditUri,
-                new StringContent(text));
+            var content = new StringContent(text);
+            content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
+            var responseMessage = await client.PostAsync(_configOptions.CreditUri, content);
             var response = await responseMessage.Content.ReadAsStringAsync();
-            _logger.LogInformation(text);
 
-            return JsonSerializer.Deserialize<QueryCreditResponseDto>(response);
+            var res = JsonSerializer.Deserialize<QueryCreditResponseDto>(response);
+
+            if (res.Code != "0000")
+            {
+                res.Msg += $" 请求Credit使用参数：{text}";
+            }
+
+            return res;
         }
 
         [HttpPost("change_status")]
@@ -180,6 +192,47 @@ namespace RuralAssets.WebApplication.Controllers
                 };
             }
 
+            foreach (var assetInChain in input.AssetList)
+            {
+                if (assetInChain.Status == "1")
+                {
+                    if (string.IsNullOrEmpty(assetInChain.BankId) || assetInChain.LoanAmount < 0.0001 ||
+                        string.IsNullOrEmpty(assetInChain.DueDate) || !assetInChain.LoanAgreement.Any() ||
+                        assetInChain.LoanRate < 0.0001)
+                    {
+                        message = MessageHelper.Message.ParameterMissed;
+                        return new ResponseDto
+                        {
+                            Code = MessageHelper.GetCode(message),
+                            Msg = MessageHelper.GetMessage(message),
+                            Description = "状态为冻结时，银行标识、放款金额、到期日、贷款利率、贷款协议为必填项"
+                        };
+                    }
+
+                    if (!DateTime.TryParse(assetInChain.DueDate, out _))
+                    {
+                        message = MessageHelper.Message.ParameterTypeNotMatch;
+                        return new ResponseDto
+                        {
+                            Code = MessageHelper.GetCode(message),
+                            Msg = MessageHelper.GetMessage(message),
+                            Description = "到期日转换失败"
+                        };
+                    }
+                    
+                    if (!int.TryParse(assetInChain.Status, out _))
+                    {
+                        message = MessageHelper.Message.ParameterTypeNotMatch;
+                        return new ResponseDto
+                        {
+                            Code = MessageHelper.GetCode(message),
+                            Msg = MessageHelper.GetMessage(message),
+                            Description = "资产状态不正确，1：冻结，2：逾期，3：正常"
+                        };
+                    }
+                }
+            }
+
             var nodeManager = new NodeManager(_configOptions.BlockChainEndpoint);
             var txId = nodeManager.SendTransaction(_configOptions.AccountAddress, _configOptions.RuralContractAddress,
                 "SetAssetInfo", new AssetInfo
@@ -190,16 +243,22 @@ namespace RuralAssets.WebApplication.Controllers
                     AssetIdList = {input.AssetList.Select(a => a.AssetId)},
                     AssetList =
                     {
-                        input.AssetList.Select(a => new Asset
+                        input.AssetList.Select(a =>
                         {
-                            AssetId = a.AssetId,
-                            Status = a.Status,
-                            BankId = a.BankId,
-                            LoanAmount = DoubleToLong(a.LoanAmount),
-                            LoanAgreement = ByteString.CopyFrom(a.LoanAgreement),
-                            DueDate = Timestamp.FromDateTime(DateTime.Parse(a.DueDate)),
-                            LoanRate = DoubleToLong(a.LoanRate),
-                            IdCard = input.IdCard
+                            var asset = new Asset
+                            {
+                                AssetId = a.AssetId,
+                                Status = a.Status,
+                                BankId = a.BankId ?? string.Empty,
+                                LoanAmount = DoubleToLong(a.LoanAmount),
+                                LoanAgreement = a.LoanAgreement == null ? ByteString.Empty : ByteString.CopyFrom(a.LoanAgreement),
+                                DueDate = a.DueDate == null
+                                    ? new Timestamp()
+                                    : Timestamp.FromDateTime(DateTime.Parse(a.DueDate)),
+                                LoanRate = DoubleToLong(a.LoanRate),
+                                IdCard = input.IdCard
+                            };
+                            return asset;
                         })
                     }
                 });
@@ -208,20 +267,7 @@ namespace RuralAssets.WebApplication.Controllers
             var success = true;
             foreach (var assetInChain in input.AssetList)
             {
-                var status = 1;
-                switch (assetInChain.Status)
-                {
-                    case "冻结":
-                        status = 1;
-                        break;
-                    case "逾期":
-                        status = 2;
-                        break;
-                    case "正常":
-                        status = 3;
-                        break;
-                }
-
+                var status = int.Parse(assetInChain.Status);
                 var sql = SqlStatementHelper.GetChangeStatusSql(input.Name, input.IdCard, assetInChain.AssetId, status);
                 var row = await MySqlHelper.ExecuteNonQueryAsync(_configOptions.RuralAssetsConnectString, sql);
                 if (row == 0)
