@@ -50,7 +50,7 @@ WHERE
         }
 
         public static string GetListSql(string name, string idCard, int assetId, double bfzt, string lsx,
-            string lsxz, string lsc)
+            string lsxz, string lsc, int pageNo, int pageSize)
         {
             return $@"
 select
@@ -80,15 +80,15 @@ select
                    +
                    (string.IsNullOrEmpty(lsx)
                        ? ""
-                       : $" and a.lsxid = {lsx}")
+                       : $" and e.lsxid = {lsx}")
                    +
                    (string.IsNullOrEmpty(lsxz)
                        ? ""
-                       : $" and a.lsxzid = {lsxz}") +
+                       : $" and e.lsxzid = {lsxz}") +
                    (string.IsNullOrEmpty(lsc)
                        ? ""
-                       : $" and a.lsc = {lsc}") +
-                   " order by a.id asc limit 0,100";
+                       : $" and e.lsc = {lsc}") +
+                   $" order by a.id asc limit {pageNo},{pageSize}";
         }
 
         public static string GetDetailSql(string name, string idCard, int assetId)

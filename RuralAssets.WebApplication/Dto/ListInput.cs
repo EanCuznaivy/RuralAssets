@@ -10,6 +10,10 @@ namespace RuralAssets.WebApplication
 
         [JsonPropertyName("asset_type")] public int AssetType { get; set; }
 
+        [JsonPropertyName("pageno")] public int PageNo { get; set; }
+
+        [JsonPropertyName("pagesize")] public int PageSize { get; set; }
+
         /// <summary>
         /// 资产Id
         /// </summary>

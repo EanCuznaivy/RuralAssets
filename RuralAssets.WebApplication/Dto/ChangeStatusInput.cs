@@ -54,6 +54,6 @@ namespace RuralAssets.WebApplication
         /// 贷款协议
         /// </summary>
         [JsonPropertyName("loan_agreement")]
-        public byte[] LoanAgreement { get; set; }
+        public string LoanAgreement { get; set; }
     }
 }

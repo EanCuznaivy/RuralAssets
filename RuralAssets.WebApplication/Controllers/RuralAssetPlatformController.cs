@@ -251,7 +251,9 @@ namespace RuralAssets.WebApplication.Controllers
                                 Status = a.Status,
                                 BankId = a.BankId ?? string.Empty,
                                 LoanAmount = DoubleToLong(a.LoanAmount),
-                                LoanAgreement = a.LoanAgreement == null ? ByteString.Empty : ByteString.CopyFrom(a.LoanAgreement),
+                                LoanAgreement = a.LoanAgreement == null
+                                    ? ByteString.Empty
+                                    : ByteString.CopyFromUtf8(a.LoanAgreement),
                                 DueDate = a.DueDate == null
                                     ? new Timestamp()
                                     : Timestamp.FromDateTime(DateTime.Parse(a.DueDate)),
@@ -314,6 +316,17 @@ namespace RuralAssets.WebApplication.Controllers
                 };
             }
 
+            if (input.PageNo < 0 || input.PageSize < 0)
+            {
+                message = MessageHelper.Message.ParameterTypeNotMatch;
+                return new ListResponseDto
+                {
+                    Code = MessageHelper.GetCode(message),
+                    Msg = MessageHelper.GetMessage(message),
+                    Description = "分页数据不可为负数"
+                };
+            }
+
             // TODO: Type check.
 
             var response = new ListResponseDto
@@ -323,7 +336,7 @@ namespace RuralAssets.WebApplication.Controllers
                 List = new List<AssetDto>()
             };
             var sql = SqlStatementHelper.GetListSql(input.Name, input.IdCard, input.AssetId, input.BFZT, input.LSX,
-                input.LSXZ, input.LSC);
+                input.LSXZ, input.LSC, input.PageNo, input.PageSize == 0 ? 100 : input.PageSize);
             var dataReader =
                 await MySqlHelper.ExecuteReaderAsync(_configOptions.RuralAssetsConnectString, sql);
             while (dataReader.Read())
