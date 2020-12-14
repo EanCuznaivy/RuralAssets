@@ -256,7 +256,7 @@ namespace RuralAssets.WebApplication.Controllers
                                     : ByteString.CopyFromUtf8(a.LoanAgreement),
                                 DueDate = a.DueDate == null
                                     ? new Timestamp()
-                                    : Timestamp.FromDateTime(DateTime.Parse(a.DueDate)),
+                                    : Timestamp.FromDateTime(DateTime.Parse(a.DueDate).ToUniversalTime()),
                                 LoanRate = DoubleToLong(a.LoanRate),
                                 IdCard = input.IdCard
                             };
@@ -283,7 +283,7 @@ namespace RuralAssets.WebApplication.Controllers
                 Code = MessageHelper.GetCode(MessageHelper.Message.Success),
                 Msg = MessageHelper.GetMessage(MessageHelper.Message.Success),
                 Result = success ? "1" : "0",
-                Description = $"{(success ? "成功" : "失败")}\n交易Id：{txId}\n交易状态：{result.Status}"
+                Description = $"{(success ? "成功" : "失败")} 交易Id：{txId} 交易状态：{result.Status} 交易打包区块高度：{result.BlockNumber}"
             };
         }
 

@@ -267,13 +267,6 @@ __pycache__/
 .vs/
 slnx.sqlite
 
-# Generated Protobuf classes
-*.g.cs
-*.c.cs
-grpc_csharp_plugin
-*Grpc.cs
-**/Generated/*.cs
-
 launchSettings.json
 
 yarn.lock
