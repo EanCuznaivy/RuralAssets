@@ -30,26 +30,26 @@ namespace AElf.Contracts.Assets {
             "bGUvcHJvdG9idWYvdGltZXN0YW1wLnByb3RvIngKCUFzc2V0SW5mbxIMCgRu",
             "YW1lGAEgASgJEg8KB2lkX2NhcmQYAiABKAkSEgoKYXNzZXRfdHlwZRgDIAEo",
             "BRIVCg1hc3NldF9pZF9saXN0GAQgAygFEiEKCmFzc2V0X2xpc3QYBSADKAsy",
-            "DS5Bc3NldHMuQXNzZXQiuQEKBUFzc2V0EhAKCGFzc2V0X2lkGAEgASgFEg4K",
+            "DS5Bc3NldHMuQXNzZXQinQEKBUFzc2V0EhAKCGFzc2V0X2lkGAEgASgFEg4K",
             "BnN0YXR1cxgCIAEoCRIPCgdiYW5rX2lkGAMgASgJEhMKC2xvYW5fYW1vdW50",
-            "GAQgASgDEiwKCGR1ZV9kYXRlGAUgASgLMhouZ29vZ2xlLnByb3RvYnVmLlRp",
-            "bWVzdGFtcBIRCglsb2FuX3JhdGUYBiABKAMSFgoObG9hbl9hZ3JlZW1lbnQY",
-            "ByABKAwSDwoHaWRfY2FyZBgIIAEoCSIrCgtKc29uTWVzc2FnZRILCgNrZXkY",
-            "ASABKAkSDwoHbWVzc2FnZRgCIAEoCSI4ChFHZXRBc3NldEluZm9JbnB1dBIP",
-            "CgdpZF9jYXJkGAEgASgJEhIKCmFzc2V0X3R5cGUYAiABKAUyoAQKDkFzc2V0",
-            "c0NvbnRyYWN0Ej4KCkluaXRpYWxpemUSFi5nb29nbGUucHJvdG9idWYuRW1w",
-            "dHkaFi5nb29nbGUucHJvdG9idWYuRW1wdHkiABI7CgxTZXRBc3NldEluZm8S",
-            "ES5Bc3NldHMuQXNzZXRJbmZvGhYuZ29vZ2xlLnByb3RvYnVmLkVtcHR5IgAS",
-            "MwoIU2V0QXNzZXQSDS5Bc3NldHMuQXNzZXQaFi5nb29nbGUucHJvdG9idWYu",
-            "RW1wdHkiABJCChFSZWNvcmRKc29uTWVzc2FnZRITLkFzc2V0cy5Kc29uTWVz",
-            "c2FnZRoWLmdvb2dsZS5wcm90b2J1Zi5FbXB0eSIAEkMKDEdldEFzc2V0SW5m",
-            "bxIZLkFzc2V0cy5HZXRBc3NldEluZm9JbnB1dBoRLkFzc2V0cy5Bc3NldElu",
-            "Zm8iBYiJ9wEBEk4KF0dldEFzc2V0SW5mb1dpdGhEZXRhaWxzEhkuQXNzZXRz",
-            "LkdldEFzc2V0SW5mb0lucHV0GhEuQXNzZXRzLkFzc2V0SW5mbyIFiIn3AQES",
-            "UwoOR2V0SnNvbk1lc3NhZ2USHC5nb29nbGUucHJvdG9idWYuU3RyaW5nVmFs",
-            "dWUaHC5nb29nbGUucHJvdG9idWYuU3RyaW5nVmFsdWUiBYiJ9wEBGi6yzPYB",
-            "KUFFbGYuQ29udHJhY3RzLkFzc2V0cy5Bc3NldHNDb250cmFjdFN0YXRlQhiq",
-            "AhVBRWxmLkNvbnRyYWN0cy5Bc3NldHNiBnByb3RvMw=="));
+            "GAQgASgDEhAKCGR1ZV9kYXRlGAUgASgJEhEKCWxvYW5fcmF0ZRgGIAEoAxIW",
+            "Cg5sb2FuX2FncmVlbWVudBgHIAEoCRIPCgdpZF9jYXJkGAggASgJIisKC0pz",
+            "b25NZXNzYWdlEgsKA2tleRgBIAEoCRIPCgdtZXNzYWdlGAIgASgJIjgKEUdl",
+            "dEFzc2V0SW5mb0lucHV0Eg8KB2lkX2NhcmQYASABKAkSEgoKYXNzZXRfdHlw",
+            "ZRgCIAEoBTKgBAoOQXNzZXRzQ29udHJhY3QSPgoKSW5pdGlhbGl6ZRIWLmdv",
+            "b2dsZS5wcm90b2J1Zi5FbXB0eRoWLmdvb2dsZS5wcm90b2J1Zi5FbXB0eSIA",
+            "EjsKDFNldEFzc2V0SW5mbxIRLkFzc2V0cy5Bc3NldEluZm8aFi5nb29nbGUu",
+            "cHJvdG9idWYuRW1wdHkiABIzCghTZXRBc3NldBINLkFzc2V0cy5Bc3NldBoW",
+            "Lmdvb2dsZS5wcm90b2J1Zi5FbXB0eSIAEkIKEVJlY29yZEpzb25NZXNzYWdl",
+            "EhMuQXNzZXRzLkpzb25NZXNzYWdlGhYuZ29vZ2xlLnByb3RvYnVmLkVtcHR5",
+            "IgASQwoMR2V0QXNzZXRJbmZvEhkuQXNzZXRzLkdldEFzc2V0SW5mb0lucHV0",
+            "GhEuQXNzZXRzLkFzc2V0SW5mbyIFiIn3AQESTgoXR2V0QXNzZXRJbmZvV2l0",
+            "aERldGFpbHMSGS5Bc3NldHMuR2V0QXNzZXRJbmZvSW5wdXQaES5Bc3NldHMu",
+            "QXNzZXRJbmZvIgWIifcBARJTCg5HZXRKc29uTWVzc2FnZRIcLmdvb2dsZS5w",
+            "cm90b2J1Zi5TdHJpbmdWYWx1ZRocLmdvb2dsZS5wcm90b2J1Zi5TdHJpbmdW",
+            "YWx1ZSIFiIn3AQEaLrLM9gEpQUVsZi5Db250cmFjdHMuQXNzZXRzLkFzc2V0",
+            "c0NvbnRyYWN0U3RhdGVCGKoCFUFFbGYuQ29udHJhY3RzLkFzc2V0c2IGcHJv",
+            "dG8z"));
       descriptor = pbr::FileDescriptor.FromGeneratedCode(descriptorData,
           new pbr::FileDescriptor[] { global::AElf.Types.CoreReflection.Descriptor, global::AElf.OptionsReflection.Descriptor, global::Google.Protobuf.WellKnownTypes.EmptyReflection.Descriptor, global::Google.Protobuf.WellKnownTypes.WrappersReflection.Descriptor, global::Google.Protobuf.WellKnownTypes.TimestampReflection.Descriptor, },
           new pbr::GeneratedClrTypeInfo(null, null, new pbr::GeneratedClrTypeInfo[] {
@@ -318,7 +318,7 @@ namespace AElf.Contracts.Assets {
       status_ = other.status_;
       bankId_ = other.bankId_;
       loanAmount_ = other.loanAmount_;
-      dueDate_ = other.dueDate_ != null ? other.dueDate_.Clone() : null;
+      dueDate_ = other.dueDate_;
       loanRate_ = other.loanRate_;
       loanAgreement_ = other.loanAgreement_;
       idCard_ = other.idCard_;
@@ -376,12 +376,12 @@ namespace AElf.Contracts.Assets {
 
     /// <summary>Field number for the "due_date" field.</summary>
     public const int DueDateFieldNumber = 5;
-    private global::Google.Protobuf.WellKnownTypes.Timestamp dueDate_;
+    private string dueDate_ = "";
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public global::Google.Protobuf.WellKnownTypes.Timestamp DueDate {
+    public string DueDate {
       get { return dueDate_; }
       set {
-        dueDate_ = value;
+        dueDate_ = pb::ProtoPreconditions.CheckNotNull(value, "value");
       }
     }
 
@@ -398,9 +398,9 @@ namespace AElf.Contracts.Assets {
 
     /// <summary>Field number for the "loan_agreement" field.</summary>
     public const int LoanAgreementFieldNumber = 7;
-    private pb::ByteString loanAgreement_ = pb::ByteString.Empty;
+    private string loanAgreement_ = "";
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public pb::ByteString LoanAgreement {
+    public string LoanAgreement {
       get { return loanAgreement_; }
       set {
         loanAgreement_ = pb::ProtoPreconditions.CheckNotNull(value, "value");
@@ -435,7 +435,7 @@ namespace AElf.Contracts.Assets {
       if (Status != other.Status) return false;
       if (BankId != other.BankId) return false;
       if (LoanAmount != other.LoanAmount) return false;
-      if (!object.Equals(DueDate, other.DueDate)) return false;
+      if (DueDate != other.DueDate) return false;
       if (LoanRate != other.LoanRate) return false;
       if (LoanAgreement != other.LoanAgreement) return false;
       if (IdCard != other.IdCard) return false;
@@ -449,7 +449,7 @@ namespace AElf.Contracts.Assets {
       if (Status.Length != 0) hash ^= Status.GetHashCode();
       if (BankId.Length != 0) hash ^= BankId.GetHashCode();
       if (LoanAmount != 0L) hash ^= LoanAmount.GetHashCode();
-      if (dueDate_ != null) hash ^= DueDate.GetHashCode();
+      if (DueDate.Length != 0) hash ^= DueDate.GetHashCode();
       if (LoanRate != 0L) hash ^= LoanRate.GetHashCode();
       if (LoanAgreement.Length != 0) hash ^= LoanAgreement.GetHashCode();
       if (IdCard.Length != 0) hash ^= IdCard.GetHashCode();
@@ -482,9 +482,9 @@ namespace AElf.Contracts.Assets {
         output.WriteRawTag(32);
         output.WriteInt64(LoanAmount);
       }
-      if (dueDate_ != null) {
+      if (DueDate.Length != 0) {
         output.WriteRawTag(42);
-        output.WriteMessage(DueDate);
+        output.WriteString(DueDate);
       }
       if (LoanRate != 0L) {
         output.WriteRawTag(48);
@@ -492,7 +492,7 @@ namespace AElf.Contracts.Assets {
       }
       if (LoanAgreement.Length != 0) {
         output.WriteRawTag(58);
-        output.WriteBytes(LoanAgreement);
+        output.WriteString(LoanAgreement);
       }
       if (IdCard.Length != 0) {
         output.WriteRawTag(66);
@@ -518,14 +518,14 @@ namespace AElf.Contracts.Assets {
       if (LoanAmount != 0L) {
         size += 1 + pb::CodedOutputStream.ComputeInt64Size(LoanAmount);
       }
-      if (dueDate_ != null) {
-        size += 1 + pb::CodedOutputStream.ComputeMessageSize(DueDate);
+      if (DueDate.Length != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeStringSize(DueDate);
       }
       if (LoanRate != 0L) {
         size += 1 + pb::CodedOutputStream.ComputeInt64Size(LoanRate);
       }
       if (LoanAgreement.Length != 0) {
-        size += 1 + pb::CodedOutputStream.ComputeBytesSize(LoanAgreement);
+        size += 1 + pb::CodedOutputStream.ComputeStringSize(LoanAgreement);
       }
       if (IdCard.Length != 0) {
         size += 1 + pb::CodedOutputStream.ComputeStringSize(IdCard);
@@ -553,11 +553,8 @@ namespace AElf.Contracts.Assets {
       if (other.LoanAmount != 0L) {
         LoanAmount = other.LoanAmount;
       }
-      if (other.dueDate_ != null) {
-        if (dueDate_ == null) {
-          DueDate = new global::Google.Protobuf.WellKnownTypes.Timestamp();
-        }
-        DueDate.MergeFrom(other.DueDate);
+      if (other.DueDate.Length != 0) {
+        DueDate = other.DueDate;
       }
       if (other.LoanRate != 0L) {
         LoanRate = other.LoanRate;
@@ -596,10 +593,7 @@ namespace AElf.Contracts.Assets {
             break;
           }
           case 42: {
-            if (dueDate_ == null) {
-              DueDate = new global::Google.Protobuf.WellKnownTypes.Timestamp();
-            }
-            input.ReadMessage(DueDate);
+            DueDate = input.ReadString();
             break;
           }
           case 48: {
@@ -607,7 +601,7 @@ namespace AElf.Contracts.Assets {
             break;
           }
           case 58: {
-            LoanAgreement = input.ReadBytes();
+            LoanAgreement = input.ReadString();
             break;
           }
           case 66: {
