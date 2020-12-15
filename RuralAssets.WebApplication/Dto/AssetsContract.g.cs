@@ -34,23 +34,28 @@ namespace AElf.Contracts.Assets {
             "BnN0YXR1cxgCIAEoCRIPCgdiYW5rX2lkGAMgASgJEhMKC2xvYW5fYW1vdW50",
             "GAQgASgDEiwKCGR1ZV9kYXRlGAUgASgLMhouZ29vZ2xlLnByb3RvYnVmLlRp",
             "bWVzdGFtcBIRCglsb2FuX3JhdGUYBiABKAMSFgoObG9hbl9hZ3JlZW1lbnQY",
-            "ByABKAwSDwoHaWRfY2FyZBgIIAEoCSI4ChFHZXRBc3NldEluZm9JbnB1dBIP",
-            "CgdpZF9jYXJkGAEgASgJEhIKCmFzc2V0X3R5cGUYAiABKAUyhwMKDkFzc2V0",
+            "ByABKAwSDwoHaWRfY2FyZBgIIAEoCSIrCgtKc29uTWVzc2FnZRILCgNrZXkY",
+            "ASABKAkSDwoHbWVzc2FnZRgCIAEoCSI4ChFHZXRBc3NldEluZm9JbnB1dBIP",
+            "CgdpZF9jYXJkGAEgASgJEhIKCmFzc2V0X3R5cGUYAiABKAUyoAQKDkFzc2V0",
             "c0NvbnRyYWN0Ej4KCkluaXRpYWxpemUSFi5nb29nbGUucHJvdG9idWYuRW1w",
             "dHkaFi5nb29nbGUucHJvdG9idWYuRW1wdHkiABI7CgxTZXRBc3NldEluZm8S",
             "ES5Bc3NldHMuQXNzZXRJbmZvGhYuZ29vZ2xlLnByb3RvYnVmLkVtcHR5IgAS",
             "MwoIU2V0QXNzZXQSDS5Bc3NldHMuQXNzZXQaFi5nb29nbGUucHJvdG9idWYu",
-            "RW1wdHkiABJDCgxHZXRBc3NldEluZm8SGS5Bc3NldHMuR2V0QXNzZXRJbmZv",
-            "SW5wdXQaES5Bc3NldHMuQXNzZXRJbmZvIgWIifcBARJOChdHZXRBc3NldElu",
-            "Zm9XaXRoRGV0YWlscxIZLkFzc2V0cy5HZXRBc3NldEluZm9JbnB1dBoRLkFz",
-            "c2V0cy5Bc3NldEluZm8iBYiJ9wEBGi6yzPYBKUFFbGYuQ29udHJhY3RzLkFz",
-            "c2V0cy5Bc3NldHNDb250cmFjdFN0YXRlQhiqAhVBRWxmLkNvbnRyYWN0cy5B",
-            "c3NldHNiBnByb3RvMw=="));
+            "RW1wdHkiABJCChFSZWNvcmRKc29uTWVzc2FnZRITLkFzc2V0cy5Kc29uTWVz",
+            "c2FnZRoWLmdvb2dsZS5wcm90b2J1Zi5FbXB0eSIAEkMKDEdldEFzc2V0SW5m",
+            "bxIZLkFzc2V0cy5HZXRBc3NldEluZm9JbnB1dBoRLkFzc2V0cy5Bc3NldElu",
+            "Zm8iBYiJ9wEBEk4KF0dldEFzc2V0SW5mb1dpdGhEZXRhaWxzEhkuQXNzZXRz",
+            "LkdldEFzc2V0SW5mb0lucHV0GhEuQXNzZXRzLkFzc2V0SW5mbyIFiIn3AQES",
+            "UwoOR2V0SnNvbk1lc3NhZ2USHC5nb29nbGUucHJvdG9idWYuU3RyaW5nVmFs",
+            "dWUaHC5nb29nbGUucHJvdG9idWYuU3RyaW5nVmFsdWUiBYiJ9wEBGi6yzPYB",
+            "KUFFbGYuQ29udHJhY3RzLkFzc2V0cy5Bc3NldHNDb250cmFjdFN0YXRlQhiq",
+            "AhVBRWxmLkNvbnRyYWN0cy5Bc3NldHNiBnByb3RvMw=="));
       descriptor = pbr::FileDescriptor.FromGeneratedCode(descriptorData,
           new pbr::FileDescriptor[] { global::AElf.Types.CoreReflection.Descriptor, global::AElf.OptionsReflection.Descriptor, global::Google.Protobuf.WellKnownTypes.EmptyReflection.Descriptor, global::Google.Protobuf.WellKnownTypes.WrappersReflection.Descriptor, global::Google.Protobuf.WellKnownTypes.TimestampReflection.Descriptor, },
           new pbr::GeneratedClrTypeInfo(null, null, new pbr::GeneratedClrTypeInfo[] {
             new pbr::GeneratedClrTypeInfo(typeof(global::AElf.Contracts.Assets.AssetInfo), global::AElf.Contracts.Assets.AssetInfo.Parser, new[]{ "Name", "IdCard", "AssetType", "AssetIdList", "AssetList" }, null, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::AElf.Contracts.Assets.Asset), global::AElf.Contracts.Assets.Asset.Parser, new[]{ "AssetId", "Status", "BankId", "LoanAmount", "DueDate", "LoanRate", "LoanAgreement", "IdCard" }, null, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::AElf.Contracts.Assets.JsonMessage), global::AElf.Contracts.Assets.JsonMessage.Parser, new[]{ "Key", "Message" }, null, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::AElf.Contracts.Assets.GetAssetInfoInput), global::AElf.Contracts.Assets.GetAssetInfoInput.Parser, new[]{ "IdCard", "AssetType" }, null, null, null, null)
           }));
     }
@@ -615,6 +620,163 @@ namespace AElf.Contracts.Assets {
 
   }
 
+  public sealed partial class JsonMessage : pb::IMessage<JsonMessage> {
+    private static readonly pb::MessageParser<JsonMessage> _parser = new pb::MessageParser<JsonMessage>(() => new JsonMessage());
+    private pb::UnknownFieldSet _unknownFields;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public static pb::MessageParser<JsonMessage> Parser { get { return _parser; } }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public static pbr::MessageDescriptor Descriptor {
+      get { return global::AElf.Contracts.Assets.AssetsContractReflection.Descriptor.MessageTypes[2]; }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    pbr::MessageDescriptor pb::IMessage.Descriptor {
+      get { return Descriptor; }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public JsonMessage() {
+      OnConstruction();
+    }
+
+    partial void OnConstruction();
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public JsonMessage(JsonMessage other) : this() {
+      key_ = other.key_;
+      message_ = other.message_;
+      _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public JsonMessage Clone() {
+      return new JsonMessage(this);
+    }
+
+    /// <summary>Field number for the "key" field.</summary>
+    public const int KeyFieldNumber = 1;
+    private string key_ = "";
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public string Key {
+      get { return key_; }
+      set {
+        key_ = pb::ProtoPreconditions.CheckNotNull(value, "value");
+      }
+    }
+
+    /// <summary>Field number for the "message" field.</summary>
+    public const int MessageFieldNumber = 2;
+    private string message_ = "";
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public string Message {
+      get { return message_; }
+      set {
+        message_ = pb::ProtoPreconditions.CheckNotNull(value, "value");
+      }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public override bool Equals(object other) {
+      return Equals(other as JsonMessage);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public bool Equals(JsonMessage other) {
+      if (ReferenceEquals(other, null)) {
+        return false;
+      }
+      if (ReferenceEquals(other, this)) {
+        return true;
+      }
+      if (Key != other.Key) return false;
+      if (Message != other.Message) return false;
+      return Equals(_unknownFields, other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public override int GetHashCode() {
+      int hash = 1;
+      if (Key.Length != 0) hash ^= Key.GetHashCode();
+      if (Message.Length != 0) hash ^= Message.GetHashCode();
+      if (_unknownFields != null) {
+        hash ^= _unknownFields.GetHashCode();
+      }
+      return hash;
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public override string ToString() {
+      return pb::JsonFormatter.ToDiagnosticString(this);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public void WriteTo(pb::CodedOutputStream output) {
+      if (Key.Length != 0) {
+        output.WriteRawTag(10);
+        output.WriteString(Key);
+      }
+      if (Message.Length != 0) {
+        output.WriteRawTag(18);
+        output.WriteString(Message);
+      }
+      if (_unknownFields != null) {
+        _unknownFields.WriteTo(output);
+      }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public int CalculateSize() {
+      int size = 0;
+      if (Key.Length != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeStringSize(Key);
+      }
+      if (Message.Length != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeStringSize(Message);
+      }
+      if (_unknownFields != null) {
+        size += _unknownFields.CalculateSize();
+      }
+      return size;
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public void MergeFrom(JsonMessage other) {
+      if (other == null) {
+        return;
+      }
+      if (other.Key.Length != 0) {
+        Key = other.Key;
+      }
+      if (other.Message.Length != 0) {
+        Message = other.Message;
+      }
+      _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public void MergeFrom(pb::CodedInputStream input) {
+      uint tag;
+      while ((tag = input.ReadTag()) != 0) {
+        switch(tag) {
+          default:
+            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, input);
+            break;
+          case 10: {
+            Key = input.ReadString();
+            break;
+          }
+          case 18: {
+            Message = input.ReadString();
+            break;
+          }
+        }
+      }
+    }
+
+  }
+
   public sealed partial class GetAssetInfoInput : pb::IMessage<GetAssetInfoInput> {
     private static readonly pb::MessageParser<GetAssetInfoInput> _parser = new pb::MessageParser<GetAssetInfoInput>(() => new GetAssetInfoInput());
     private pb::UnknownFieldSet _unknownFields;
@@ -623,7 +785,7 @@ namespace AElf.Contracts.Assets {
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::AElf.Contracts.Assets.AssetsContractReflection.Descriptor.MessageTypes[2]; }
+      get { return global::AElf.Contracts.Assets.AssetsContractReflection.Descriptor.MessageTypes[3]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
