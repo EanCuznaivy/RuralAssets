@@ -49,7 +49,7 @@ WHERE
 ";
         }
 
-        public static string GetInsertToEntityTdbcLoanString(string name, string idCard, int assetType, int assetId,
+        public static string GetInsertToEntityTdbcLoanSql(string name, string idCard, int assetType, int assetId,
             int status, string bankId, double loanAmount, string dueDate, double loanInterest, string txId)
         {
             var loadInterestPercent = "%" + loanInterest.ToString("P2");

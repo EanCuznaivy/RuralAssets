@@ -278,7 +278,7 @@ namespace RuralAssets.WebApplication.Controllers
                 }
 
                 var dueDate = assetInChain.DueDate ?? string.Empty;
-                sql = SqlStatementHelper.GetInsertToEntityTdbcLoanString(input.Name, input.IdCard, input.AssetType,
+                sql = SqlStatementHelper.GetInsertToEntityTdbcLoanSql(input.Name, input.IdCard, input.AssetType,
                     assetInChain.AssetId, status, assetInChain.BankId, assetInChain.LoanAmount,
                     dueDate, assetInChain.LoanRate, txId);
                 row = await MySqlHelper.ExecuteNonQueryAsync(_configOptions.RuralAssetsConnectString, sql);
