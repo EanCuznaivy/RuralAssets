@@ -276,6 +276,16 @@ namespace RuralAssets.WebApplication.Controllers
                 {
                     success = false;
                 }
+
+                var dueDate = assetInChain.DueDate ?? string.Empty;
+                sql = SqlStatementHelper.GetInsertToEntityTdbcLoanString(input.Name, input.IdCard, input.AssetType,
+                    assetInChain.AssetId, status, assetInChain.BankId, assetInChain.LoanAmount,
+                    dueDate, assetInChain.LoanRate, txId);
+                row = await MySqlHelper.ExecuteNonQueryAsync(_configOptions.RuralAssetsConnectString, sql);
+                if (row == 0)
+                {
+                    success = false;
+                }
             }
 
             return new ResponseDto
@@ -326,6 +336,8 @@ namespace RuralAssets.WebApplication.Controllers
                     Description = "分页数据不可为负数"
                 };
             }
+            if (input.PageSize == 0)
+                input.PageSize = 100;
 
             // TODO: Type check.
 

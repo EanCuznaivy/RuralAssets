@@ -21,7 +21,7 @@ namespace RuralAssets.WebApplication
             _keyStore = AElfKeyStore.GetKeyStore(keyPath);
 
             ApiClient = AElfClientExtension.GetClient(baseUrl);
-            var check = AsyncHelper.RunSync(() => ApiClient.IsConnected());
+            var check = AsyncHelper.RunSync(() => ApiClient.IsConnectedAsync());
             _chainId = GetChainId();
         }
 
@@ -34,7 +34,7 @@ namespace RuralAssets.WebApplication
         {
             _baseUrl = url;
             ApiClient = AElfClientExtension.GetClient(url);
-            var check = AsyncHelper.RunSync(() => ApiClient.IsConnected());
+            var check = AsyncHelper.RunSync(() => ApiClient.IsConnectedAsync());
             if (!check)
             {
                 return false;
