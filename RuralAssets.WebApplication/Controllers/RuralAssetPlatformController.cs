@@ -251,12 +251,8 @@ namespace RuralAssets.WebApplication.Controllers
                                 Status = a.Status,
                                 BankId = a.BankId ?? string.Empty,
                                 LoanAmount = DoubleToLong(a.LoanAmount),
-                                LoanAgreement = a.LoanAgreement == null
-                                    ? ByteString.Empty
-                                    : ByteString.CopyFromUtf8(a.LoanAgreement),
-                                DueDate = a.DueDate == null
-                                    ? new Timestamp()
-                                    : Timestamp.FromDateTime(DateTime.Parse(a.DueDate).ToUniversalTime()),
+                                LoanAgreement = a.LoanAgreement ?? string.Empty,
+                                DueDate = a.DueDate ?? string.Empty,
                                 LoanRate = DoubleToLong(a.LoanRate),
                                 IdCard = input.IdCard
                             };
