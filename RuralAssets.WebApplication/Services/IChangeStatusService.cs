@@ -53,8 +53,7 @@ namespace RuralAssets.WebApplication
                 if (assetInChain.Status == "1")
                 {
                     if (string.IsNullOrEmpty(assetInChain.BankId) || assetInChain.LoanAmount < 0.0001 ||
-                        string.IsNullOrEmpty(assetInChain.DueDate) || !assetInChain.LoanAgreementHash.Any() ||
-                        assetInChain.LoanRate < 0.0001)
+                        string.IsNullOrEmpty(assetInChain.DueDate) || assetInChain.LoanRate < 0.0001)
                     {
                         message = MessageHelper.Message.ParameterMissed;
                         return new ResponseDto
@@ -142,7 +141,7 @@ namespace RuralAssets.WebApplication
                             Status = a.Status,
                             BankId = a.BankId ?? string.Empty,
                             LoanAmount = CommonHelper.DoubleToLong(a.LoanAmount),
-                            LoanAgreementHash = a.LoanAgreementHash ?? string.Empty,
+                            LoanAgreementHash = string.Empty,
                             DueDate = a.DueDate ?? string.Empty,
                             LoanRate = CommonHelper.DoubleToLong(a.LoanRate)
                         };

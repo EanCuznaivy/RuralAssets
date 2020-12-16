@@ -48,11 +48,5 @@ namespace RuralAssets.WebApplication
         /// </summary>
         [JsonPropertyName("loan_rate")]
         public double LoanRate { get; set; }
-
-        /// <summary>
-        /// 贷款协议
-        /// </summary>
-        [JsonPropertyName("loan_agreement_hash")]
-        public string LoanAgreementHash { get; set; }
     }
 }
