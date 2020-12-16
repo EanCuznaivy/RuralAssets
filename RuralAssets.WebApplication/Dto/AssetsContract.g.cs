@@ -30,31 +30,29 @@ namespace AElf.Contracts.Assets {
             "bGUvcHJvdG9idWYvdGltZXN0YW1wLnByb3RvIngKCUFzc2V0SW5mbxIMCgRu",
             "YW1lGAEgASgJEg8KB2lkX2NhcmQYAiABKAkSEgoKYXNzZXRfdHlwZRgDIAEo",
             "BRIVCg1hc3NldF9pZF9saXN0GAQgAygFEiEKCmFzc2V0X2xpc3QYBSADKAsy",
-            "DS5Bc3NldHMuQXNzZXQinQEKBUFzc2V0EhAKCGFzc2V0X2lkGAEgASgFEg4K",
+            "DS5Bc3NldHMuQXNzZXQikQEKBUFzc2V0EhAKCGFzc2V0X2lkGAEgASgFEg4K",
             "BnN0YXR1cxgCIAEoCRIPCgdiYW5rX2lkGAMgASgJEhMKC2xvYW5fYW1vdW50",
-            "GAQgASgDEhAKCGR1ZV9kYXRlGAUgASgJEhEKCWxvYW5fcmF0ZRgGIAEoAxIW",
-            "Cg5sb2FuX2FncmVlbWVudBgHIAEoCRIPCgdpZF9jYXJkGAggASgJIisKC0pz",
-            "b25NZXNzYWdlEgsKA2tleRgBIAEoCRIPCgdtZXNzYWdlGAIgASgJIjgKEUdl",
-            "dEFzc2V0SW5mb0lucHV0Eg8KB2lkX2NhcmQYASABKAkSEgoKYXNzZXRfdHlw",
-            "ZRgCIAEoBTKgBAoOQXNzZXRzQ29udHJhY3QSPgoKSW5pdGlhbGl6ZRIWLmdv",
-            "b2dsZS5wcm90b2J1Zi5FbXB0eRoWLmdvb2dsZS5wcm90b2J1Zi5FbXB0eSIA",
-            "EjsKDFNldEFzc2V0SW5mbxIRLkFzc2V0cy5Bc3NldEluZm8aFi5nb29nbGUu",
-            "cHJvdG9idWYuRW1wdHkiABIzCghTZXRBc3NldBINLkFzc2V0cy5Bc3NldBoW",
-            "Lmdvb2dsZS5wcm90b2J1Zi5FbXB0eSIAEkIKEVJlY29yZEpzb25NZXNzYWdl",
-            "EhMuQXNzZXRzLkpzb25NZXNzYWdlGhYuZ29vZ2xlLnByb3RvYnVmLkVtcHR5",
-            "IgASQwoMR2V0QXNzZXRJbmZvEhkuQXNzZXRzLkdldEFzc2V0SW5mb0lucHV0",
-            "GhEuQXNzZXRzLkFzc2V0SW5mbyIFiIn3AQESTgoXR2V0QXNzZXRJbmZvV2l0",
-            "aERldGFpbHMSGS5Bc3NldHMuR2V0QXNzZXRJbmZvSW5wdXQaES5Bc3NldHMu",
-            "QXNzZXRJbmZvIgWIifcBARJTCg5HZXRKc29uTWVzc2FnZRIcLmdvb2dsZS5w",
-            "cm90b2J1Zi5TdHJpbmdWYWx1ZRocLmdvb2dsZS5wcm90b2J1Zi5TdHJpbmdW",
-            "YWx1ZSIFiIn3AQEaLrLM9gEpQUVsZi5Db250cmFjdHMuQXNzZXRzLkFzc2V0",
-            "c0NvbnRyYWN0U3RhdGVCGKoCFUFFbGYuQ29udHJhY3RzLkFzc2V0c2IGcHJv",
-            "dG8z"));
+            "GAQgASgDEhAKCGR1ZV9kYXRlGAUgASgJEhEKCWxvYW5fcmF0ZRgGIAEoAxIb",
+            "ChNsb2FuX2FncmVlbWVudF9oYXNoGAcgASgJIisKC0pzb25NZXNzYWdlEgsK",
+            "A2tleRgBIAEoCRIPCgdtZXNzYWdlGAIgASgJIjgKEUdldEFzc2V0SW5mb0lu",
+            "cHV0Eg8KB2lkX2NhcmQYASABKAkSEgoKYXNzZXRfdHlwZRgCIAEoBTLrAwoO",
+            "QXNzZXRzQ29udHJhY3QSPgoKSW5pdGlhbGl6ZRIWLmdvb2dsZS5wcm90b2J1",
+            "Zi5FbXB0eRoWLmdvb2dsZS5wcm90b2J1Zi5FbXB0eSIAEjsKDFNldEFzc2V0",
+            "SW5mbxIRLkFzc2V0cy5Bc3NldEluZm8aFi5nb29nbGUucHJvdG9idWYuRW1w",
+            "dHkiABJCChFSZWNvcmRKc29uTWVzc2FnZRITLkFzc2V0cy5Kc29uTWVzc2Fn",
+            "ZRoWLmdvb2dsZS5wcm90b2J1Zi5FbXB0eSIAEkMKDEdldEFzc2V0SW5mbxIZ",
+            "LkFzc2V0cy5HZXRBc3NldEluZm9JbnB1dBoRLkFzc2V0cy5Bc3NldEluZm8i",
+            "BYiJ9wEBEk4KF0dldEFzc2V0SW5mb1dpdGhEZXRhaWxzEhkuQXNzZXRzLkdl",
+            "dEFzc2V0SW5mb0lucHV0GhEuQXNzZXRzLkFzc2V0SW5mbyIFiIn3AQESUwoO",
+            "R2V0SnNvbk1lc3NhZ2USHC5nb29nbGUucHJvdG9idWYuU3RyaW5nVmFsdWUa",
+            "HC5nb29nbGUucHJvdG9idWYuU3RyaW5nVmFsdWUiBYiJ9wEBGi6yzPYBKUFF",
+            "bGYuQ29udHJhY3RzLkFzc2V0cy5Bc3NldHNDb250cmFjdFN0YXRlQhiqAhVB",
+            "RWxmLkNvbnRyYWN0cy5Bc3NldHNiBnByb3RvMw=="));
       descriptor = pbr::FileDescriptor.FromGeneratedCode(descriptorData,
           new pbr::FileDescriptor[] { global::AElf.Types.CoreReflection.Descriptor, global::AElf.OptionsReflection.Descriptor, global::Google.Protobuf.WellKnownTypes.EmptyReflection.Descriptor, global::Google.Protobuf.WellKnownTypes.WrappersReflection.Descriptor, global::Google.Protobuf.WellKnownTypes.TimestampReflection.Descriptor, },
           new pbr::GeneratedClrTypeInfo(null, null, new pbr::GeneratedClrTypeInfo[] {
             new pbr::GeneratedClrTypeInfo(typeof(global::AElf.Contracts.Assets.AssetInfo), global::AElf.Contracts.Assets.AssetInfo.Parser, new[]{ "Name", "IdCard", "AssetType", "AssetIdList", "AssetList" }, null, null, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::AElf.Contracts.Assets.Asset), global::AElf.Contracts.Assets.Asset.Parser, new[]{ "AssetId", "Status", "BankId", "LoanAmount", "DueDate", "LoanRate", "LoanAgreement", "IdCard" }, null, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::AElf.Contracts.Assets.Asset), global::AElf.Contracts.Assets.Asset.Parser, new[]{ "AssetId", "Status", "BankId", "LoanAmount", "DueDate", "LoanRate", "LoanAgreementHash" }, null, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::AElf.Contracts.Assets.JsonMessage), global::AElf.Contracts.Assets.JsonMessage.Parser, new[]{ "Key", "Message" }, null, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::AElf.Contracts.Assets.GetAssetInfoInput), global::AElf.Contracts.Assets.GetAssetInfoInput.Parser, new[]{ "IdCard", "AssetType" }, null, null, null, null)
           }));
@@ -320,8 +318,7 @@ namespace AElf.Contracts.Assets {
       loanAmount_ = other.loanAmount_;
       dueDate_ = other.dueDate_;
       loanRate_ = other.loanRate_;
-      loanAgreement_ = other.loanAgreement_;
-      idCard_ = other.idCard_;
+      loanAgreementHash_ = other.loanAgreementHash_;
       _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
     }
 
@@ -396,25 +393,14 @@ namespace AElf.Contracts.Assets {
       }
     }
 
-    /// <summary>Field number for the "loan_agreement" field.</summary>
-    public const int LoanAgreementFieldNumber = 7;
-    private string loanAgreement_ = "";
+    /// <summary>Field number for the "loan_agreement_hash" field.</summary>
+    public const int LoanAgreementHashFieldNumber = 7;
+    private string loanAgreementHash_ = "";
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public string LoanAgreement {
-      get { return loanAgreement_; }
+    public string LoanAgreementHash {
+      get { return loanAgreementHash_; }
       set {
-        loanAgreement_ = pb::ProtoPreconditions.CheckNotNull(value, "value");
-      }
-    }
-
-    /// <summary>Field number for the "id_card" field.</summary>
-    public const int IdCardFieldNumber = 8;
-    private string idCard_ = "";
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public string IdCard {
-      get { return idCard_; }
-      set {
-        idCard_ = pb::ProtoPreconditions.CheckNotNull(value, "value");
+        loanAgreementHash_ = pb::ProtoPreconditions.CheckNotNull(value, "value");
       }
     }
 
@@ -437,8 +423,7 @@ namespace AElf.Contracts.Assets {
       if (LoanAmount != other.LoanAmount) return false;
       if (DueDate != other.DueDate) return false;
       if (LoanRate != other.LoanRate) return false;
-      if (LoanAgreement != other.LoanAgreement) return false;
-      if (IdCard != other.IdCard) return false;
+      if (LoanAgreementHash != other.LoanAgreementHash) return false;
       return Equals(_unknownFields, other._unknownFields);
     }
 
@@ -451,8 +436,7 @@ namespace AElf.Contracts.Assets {
       if (LoanAmount != 0L) hash ^= LoanAmount.GetHashCode();
       if (DueDate.Length != 0) hash ^= DueDate.GetHashCode();
       if (LoanRate != 0L) hash ^= LoanRate.GetHashCode();
-      if (LoanAgreement.Length != 0) hash ^= LoanAgreement.GetHashCode();
-      if (IdCard.Length != 0) hash ^= IdCard.GetHashCode();
+      if (LoanAgreementHash.Length != 0) hash ^= LoanAgreementHash.GetHashCode();
       if (_unknownFields != null) {
         hash ^= _unknownFields.GetHashCode();
       }
@@ -490,13 +474,9 @@ namespace AElf.Contracts.Assets {
         output.WriteRawTag(48);
         output.WriteInt64(LoanRate);
       }
-      if (LoanAgreement.Length != 0) {
+      if (LoanAgreementHash.Length != 0) {
         output.WriteRawTag(58);
-        output.WriteString(LoanAgreement);
-      }
-      if (IdCard.Length != 0) {
-        output.WriteRawTag(66);
-        output.WriteString(IdCard);
+        output.WriteString(LoanAgreementHash);
       }
       if (_unknownFields != null) {
         _unknownFields.WriteTo(output);
@@ -524,11 +504,8 @@ namespace AElf.Contracts.Assets {
       if (LoanRate != 0L) {
         size += 1 + pb::CodedOutputStream.ComputeInt64Size(LoanRate);
       }
-      if (LoanAgreement.Length != 0) {
-        size += 1 + pb::CodedOutputStream.ComputeStringSize(LoanAgreement);
-      }
-      if (IdCard.Length != 0) {
-        size += 1 + pb::CodedOutputStream.ComputeStringSize(IdCard);
+      if (LoanAgreementHash.Length != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeStringSize(LoanAgreementHash);
       }
       if (_unknownFields != null) {
         size += _unknownFields.CalculateSize();
@@ -559,11 +536,8 @@ namespace AElf.Contracts.Assets {
       if (other.LoanRate != 0L) {
         LoanRate = other.LoanRate;
       }
-      if (other.LoanAgreement.Length != 0) {
-        LoanAgreement = other.LoanAgreement;
-      }
-      if (other.IdCard.Length != 0) {
-        IdCard = other.IdCard;
+      if (other.LoanAgreementHash.Length != 0) {
+        LoanAgreementHash = other.LoanAgreementHash;
       }
       _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
     }
@@ -601,11 +575,7 @@ namespace AElf.Contracts.Assets {
             break;
           }
           case 58: {
-            LoanAgreement = input.ReadString();
-            break;
-          }
-          case 66: {
-            IdCard = input.ReadString();
+            LoanAgreementHash = input.ReadString();
             break;
           }
         }

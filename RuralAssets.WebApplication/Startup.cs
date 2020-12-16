@@ -28,6 +28,7 @@ namespace RuralAssets.WebApplication
 
             services.AddApplication<AbpAspNetCoreModule>();
             services.AddTransient<IValidationService, ValidationService>();
+            services.AddTransient<IChangeStatusService, ChangeStatusService>();
             services.AddSingleton<IDistributedCacheSerializer, Utf8JsonDistributedCacheSerializer>();
             services.AddSingleton<IDistributedCacheKeyNormalizer, DistributedCacheKeyNormalizer>();
             services.AddSingleton(typeof(IDistributedCache<>), typeof(DistributedCache<>));

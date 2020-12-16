@@ -2,6 +2,7 @@
 using System.IO;
 using System.Reflection;
 using System.Text;
+using MySql.Data.MySqlClient;
 
 namespace RuralAssets.WebApplication
 {
@@ -127,6 +128,23 @@ namespace RuralAssets.WebApplication
             var cursorPosition = Console.CursorLeft;
             if (cursorPosition != 0)
                 Console.WriteLine();
+        }
+        
+        public static int ParseToInt(MySqlDataReader dataReader, int index)
+        {
+            return int.Parse(
+                string.IsNullOrEmpty(dataReader[index]?.ToString()) ? "0" : dataReader[index].ToString());
+        }
+
+        public static  double ParseToDouble(MySqlDataReader dataReader, int index)
+        {
+            return double.Parse(
+                string.IsNullOrEmpty(dataReader[index]?.ToString()) ? "0" : dataReader[index].ToString());
+        }
+        
+        public static long DoubleToLong(double origin)
+        {
+            return (long) origin * 10000;
         }
     }
 }
