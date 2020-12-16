@@ -48,6 +48,7 @@ namespace RuralAssets.WebApplication
                 options =>
                 {
                     options.SwaggerDoc("v1", new OpenApiInfo {Title = "Rural Assets Platform API", Version = "v1"});
+                    options.OperationFilter<SwaggerFileUploadFilter>();
                     options.DocInclusionPredicate((docName, description) => true);
                     options.CustomSchemaIds(type => type.FullName);
                 }

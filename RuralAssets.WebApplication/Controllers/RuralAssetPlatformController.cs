@@ -1,11 +1,13 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text.Json;
 using System.Text.Unicode;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -331,6 +333,31 @@ namespace RuralAssets.WebApplication.Controllers
                 LSC = dataReader[48]?.ToString() ?? string.Empty,
                 SFXX = dataReader[49]?.ToString() ?? string.Empty,
             };
+        }
+
+        [HttpPost("upload")]
+        public async Task<ResponseDto> UploadAsync([FromForm] UploadInput input)
+        {
+            var file = input.LoanFile;
+            if (file == null)
+            {
+                return new ResponseDto
+                {
+                    Msg = "文件为空"
+                };
+            }
+
+            var path = Path.Combine(CommonHelper.GetDefaultDataDir(), file.FileName);
+            var stream = file.OpenReadStream();
+            var bytes = new byte[stream.Length];
+            stream.Read(bytes, 0, bytes.Length);
+            stream.Seek(0, SeekOrigin.Begin);
+            var fs = new FileStream(path, FileMode.Create);
+            var bw = new BinaryWriter(fs);
+            bw.Write(bytes);
+            bw.Close();
+            fs.Close();
+            return new ResponseDto();
         }
     }
 }
