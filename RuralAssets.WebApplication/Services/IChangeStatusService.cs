@@ -89,29 +89,7 @@ namespace RuralAssets.WebApplication
             }
 
             var result = await RecordTransactionToBlockchain(input);
-
-            var success = true;
-            foreach (var assetInChain in input.AssetList)
-            {
-                var status = int.Parse(assetInChain.Status);
-                var sql = SqlStatementHelper.GetChangeStatusSql(input.Name, input.IdCard, assetInChain.AssetId, status);
-                var row = await MySqlHelper.ExecuteNonQueryAsync(_configOptions.RuralAssetsConnectString, sql);
-                if (row == 0)
-                {
-                    success = false;
-                }
-                
-                var dueDate = assetInChain.DueDate ?? string.Empty;
-                sql = SqlStatementHelper.GetInsertToEntityTdbcLoanSql(input.Name, input.IdCard, input.AssetType,
-                    assetInChain.AssetId, status, assetInChain.BankId, assetInChain.LoanAmount,
-                    dueDate, assetInChain.LoanRate, result.TransactionId);
-                row = await MySqlHelper.ExecuteNonQueryAsync(_configOptions.RuralAssetsConnectString, sql);
-                if (row == 0)
-                {
-                    success = false;
-                }
-            }
-
+            var success = await UpdateStatusInTransactionAsync(input, result.TransactionId);
             return new ResponseDto
             {
                 Code = MessageHelper.GetCode(MessageHelper.Message.Success),
@@ -120,6 +98,51 @@ namespace RuralAssets.WebApplication
                 Description =
                     $"{(success ? "成功" : "失败")} 交易Id：{result.TransactionId} 交易状态：{result.Status} 交易打包区块高度：{result.BlockNumber}"
             };
+        }
+
+        private async Task<bool> UpdateStatusInTransactionAsync(ChangeStatusInput input, string transactionId)
+        {
+            await using var conn = new MySqlConnection(_configOptions.RuralAssetsConnectString);
+            conn.Open();
+            bool isSuccess = true;
+            foreach (var assetInChain in input.AssetList)
+            {
+                await using var transaction = conn.BeginTransaction();
+                try
+                {
+                    var cmd = conn.CreateCommand();
+                    cmd.Transaction = transaction;
+                    var status = int.Parse(assetInChain.Status);
+                    cmd.CommandText =
+                        SqlStatementHelper.GetChangeStatusSql(input.Name, input.IdCard, assetInChain.AssetId, status);
+                    await cmd.ExecuteNonQueryAsync();
+
+                    var dueDate = assetInChain.DueDate ?? string.Empty;
+                    cmd.CommandText = SqlStatementHelper.GetInsertToEntityTdbcLoanSql(input.Name, input.IdCard,
+                        input.AssetType,
+                        assetInChain.AssetId, status, assetInChain.LoanId, assetInChain.BankId, assetInChain.LoanAmount,
+                        dueDate, assetInChain.LoanRate, transactionId);
+                    await cmd.ExecuteNonQueryAsync();
+
+                    foreach (var loanFile in assetInChain.LoanFiles)
+                    {
+                        cmd.CommandText = SqlStatementHelper.GetInsertFileInfoSql(input.Name, input.IdCard,
+                            input.AssetType,
+                            assetInChain.AssetId, loanFile.FileId, loanFile.FileType, loanFile.FileHash,
+                            loanFile.TransactionId);
+                        await cmd.ExecuteNonQueryAsync();
+                    }
+
+                    transaction.Commit();
+                }
+                catch (Exception)
+                {
+                    transaction.Rollback();
+                    isSuccess = false;
+                }
+            }
+
+            return isSuccess;
         }
 
         private async Task<TransactionResultDto> RecordTransactionToBlockchain(ChangeStatusInput input)

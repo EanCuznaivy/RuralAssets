@@ -9,7 +9,7 @@ namespace RuralAssets.WebApplication
     {
         public void Apply(OpenApiOperation operation, OperationFilterContext context)
         {
-            if (context.ApiDescription.HttpMethod != "PUT")
+            if (context.ApiDescription.HttpMethod != "PUT" && context.ApiDescription.HttpMethod != "POST")
             {
                 return;
             }

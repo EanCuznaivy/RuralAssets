@@ -48,25 +48,43 @@ WHERE
 	AND t.sfzh = '{idCard}' #身份证号
 ";
         }
-
+        
         public static string GetInsertToEntityTdbcLoanSql(string name, string idCard, int assetType, int assetId,
-            int status, string bankId, double loanAmount, string dueDate, double loanInterest, string txId)
+            int status, string loanId, string bankId, double loanAmount, string dueDate, double loanInterest, string txId)
         {
             var loadInterestPercent = "%" + loanInterest.ToString("P2");
             return
-                $@"INSERT INTO entity_tdbcloan ( loan_name, idcard, asset_type, asset_id, loan_status, bank_id, loan_amount, due_date, loan_rate, transaction_id )
+                $@"INSERT INTO entity_tdbcloan ( loan_name, idcard, asset_type, asset_id, loan_status, loan_id, bank_id, loan_amount, due_date, loan_rate, transaction_id)
 VALUES
 	( '{name}',                 #姓名
 	'{idCard}',      #身份证号
 	{assetType},                        #资产类型
 	{assetId},                      #资产ID
 	'{status}',                       #状态
+    '{loanId}',                        #银行贷款编号
 	'{bankId}',      #银行标识
 	{loanAmount},                 #放款金额
-    '{dueDate}',              #到期日
+	'{dueDate}',              #到期日
 	'{loadInterestPercent}',                   #贷款利率
-    '{txId}' );   #区块链交易事务ID
-";
+    '{txId}'  #区块链交易事务ID 
+)";
+        }
+
+        public static string GetInsertFileInfoSql(string name, string idCard, int assetType, int assetId, string fileId,
+            string fileType, string fileHash, string transactionId)
+        {
+            return
+                $@"INSERT INTO entity_tdbcloan_file ( loan_name, idcard, asset_type, asset_id, file_id, file_type, file_hash, transaction_id )
+VALUES
+	( '{name}', 
+      '{idCard}', 
+      {assetType}, 
+      {assetId}, 
+      '{fileId}',
+      '{fileType}', 
+      '{fileHash}', 
+      '{transactionId}' ) 
+)";
         }
         
         public static string GetListSql(string name, string idCard, int assetId, double bfzt, string lsx,

@@ -351,15 +351,15 @@ namespace RuralAssets.WebApplication.Controllers
 
             var path = Path.Combine(CommonHelper.GetDefaultDataDir(), file.FileName);
             var stream = file.OpenReadStream();
-            var bytes = new byte[stream.Length];
-            stream.Read(bytes, 0, bytes.Length);
             stream.Seek(0, SeekOrigin.Begin);
-            var fs = new FileStream(path, FileMode.Create);
-            var bw = new BinaryWriter(fs);
-            bw.Write(bytes);
-            bw.Close();
-            fs.Close();
-            return new ResponseDto();
+            await using(var fs = new FileStream(path, FileMode.Create))
+            {
+                await stream.CopyToAsync(fs);
+            }
+            return new ResponseDto
+            {
+                
+            };
         }
     }
 }
