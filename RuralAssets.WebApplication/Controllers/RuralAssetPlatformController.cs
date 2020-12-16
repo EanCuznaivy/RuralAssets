@@ -6,9 +6,6 @@ using System.Net.Http.Headers;
 using System.Text.Json;
 using System.Text.Unicode;
 using System.Threading.Tasks;
-using AElf.Contracts.Assets;
-using Google.Protobuf;
-using Google.Protobuf.WellKnownTypes;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -22,13 +19,16 @@ namespace RuralAssets.WebApplication.Controllers
     {
         private readonly ILogger<RuralAssetPlatformController> _logger;
         private readonly IValidationService _validationService;
+        private readonly IChangeStatusService _changeStatusService;
         private readonly ConfigOptions _configOptions;
 
         public RuralAssetPlatformController(ILogger<RuralAssetPlatformController> logger,
-            IValidationService validationService, IOptionsSnapshot<ConfigOptions> configOptions)
+            IValidationService validationService, IOptionsSnapshot<ConfigOptions> configOptions,
+            IChangeStatusService changeStatusService)
         {
             _logger = logger;
             _validationService = validationService;
+            _changeStatusService = changeStatusService;
             _configOptions = configOptions.Value;
         }
 
@@ -133,8 +133,8 @@ namespace RuralAssets.WebApplication.Controllers
             {
                 assetRequestList.Add(new AssetRequest
                 {
-                    AssetId = ParseToInt(dataReader, 3),
-                    BCZJE = ParseToDouble(dataReader, 34)
+                    AssetId = CommonHelper.ParseToInt(dataReader, 3),
+                    BCZJE = CommonHelper.ParseToDouble(dataReader, 34)
                 });
             }
 
@@ -170,136 +170,7 @@ namespace RuralAssets.WebApplication.Controllers
         [HttpPost("change_status")]
         public async Task<ResponseDto> ChangeStatusAsync(ChangeStatusInput input)
         {
-            MessageHelper.Message message;
-            if (!_validationService.ValidateIdCard(input.IdCard))
-            {
-                message = MessageHelper.Message.WrongIdCard;
-                return new ResponseDto
-                {
-                    Code = MessageHelper.GetCode(message),
-                    Msg = MessageHelper.GetMessage(message)
-                };
-            }
-
-            if (string.IsNullOrEmpty(input.IdCard) || string.IsNullOrEmpty(input.Name) || !input.AssetList.Any() ||
-                (input.AssetType != 1 && input.AssetType != 2))
-            {
-                message = MessageHelper.Message.ParameterMissed;
-                return new ResponseDto
-                {
-                    Code = MessageHelper.GetCode(message),
-                    Msg = MessageHelper.GetMessage(message)
-                };
-            }
-
-            foreach (var assetInChain in input.AssetList)
-            {
-                if (assetInChain.Status == "1")
-                {
-                    if (string.IsNullOrEmpty(assetInChain.BankId) || assetInChain.LoanAmount < 0.0001 ||
-                        string.IsNullOrEmpty(assetInChain.DueDate) || !assetInChain.LoanAgreement.Any() ||
-                        assetInChain.LoanRate < 0.0001)
-                    {
-                        message = MessageHelper.Message.ParameterMissed;
-                        return new ResponseDto
-                        {
-                            Code = MessageHelper.GetCode(message),
-                            Msg = MessageHelper.GetMessage(message),
-                            Description = "状态为冻结时，银行标识、放款金额、到期日、贷款利率、贷款协议为必填项"
-                        };
-                    }
-
-                    if (!DateTime.TryParse(assetInChain.DueDate, out _))
-                    {
-                        message = MessageHelper.Message.ParameterTypeNotMatch;
-                        return new ResponseDto
-                        {
-                            Code = MessageHelper.GetCode(message),
-                            Msg = MessageHelper.GetMessage(message),
-                            Description = "到期日转换失败"
-                        };
-                    }
-                    
-                    if (!int.TryParse(assetInChain.Status, out _))
-                    {
-                        message = MessageHelper.Message.ParameterTypeNotMatch;
-                        return new ResponseDto
-                        {
-                            Code = MessageHelper.GetCode(message),
-                            Msg = MessageHelper.GetMessage(message),
-                            Description = "资产状态不正确，1：冻结，2：逾期，3：正常"
-                        };
-                    }
-                }
-            }
-
-            var nodeManager = new NodeManager(_configOptions.BlockChainEndpoint);
-            var txId = nodeManager.SendTransaction(_configOptions.AccountAddress, _configOptions.RuralContractAddress,
-                "SetAssetInfo", new AssetInfo
-                {
-                    Name = input.Name,
-                    IdCard = input.IdCard,
-                    AssetType = input.AssetType,
-                    AssetIdList = {input.AssetList.Select(a => a.AssetId)},
-                    AssetList =
-                    {
-                        input.AssetList.Select(a =>
-                        {
-                            var asset = new Asset
-                            {
-                                AssetId = a.AssetId,
-                                Status = a.Status,
-                                BankId = a.BankId ?? string.Empty,
-                                LoanAmount = DoubleToLong(a.LoanAmount),
-                                LoanAgreement = a.LoanAgreement == null
-                                    ? ByteString.Empty
-                                    : ByteString.CopyFromUtf8(a.LoanAgreement),
-                                DueDate = a.DueDate == null
-                                    ? new Timestamp()
-                                    : Timestamp.FromDateTime(DateTime.Parse(a.DueDate).ToUniversalTime()),
-                                LoanRate = DoubleToLong(a.LoanRate),
-                                IdCard = input.IdCard
-                            };
-                            return asset;
-                        })
-                    }
-                });
-            var result = nodeManager.CheckTransactionResult(txId);
-
-            var success = true;
-            foreach (var assetInChain in input.AssetList)
-            {
-                var status = int.Parse(assetInChain.Status);
-                var sql = SqlStatementHelper.GetChangeStatusSql(input.Name, input.IdCard, assetInChain.AssetId, status);
-                var row = await MySqlHelper.ExecuteNonQueryAsync(_configOptions.RuralAssetsConnectString, sql);
-                if (row == 0)
-                {
-                    success = false;
-                }
-
-                var dueDate = assetInChain.DueDate ?? string.Empty;
-                sql = SqlStatementHelper.GetInsertToEntityTdbcLoanSql(input.Name, input.IdCard, input.AssetType,
-                    assetInChain.AssetId, status, assetInChain.BankId, assetInChain.LoanAmount,
-                    dueDate, assetInChain.LoanRate, txId);
-                row = await MySqlHelper.ExecuteNonQueryAsync(_configOptions.RuralAssetsConnectString, sql);
-                if (row == 0)
-                {
-                    success = false;
-                }
-            }
-
-            return new ResponseDto
-            {
-                Code = MessageHelper.GetCode(MessageHelper.Message.Success),
-                Msg = MessageHelper.GetMessage(MessageHelper.Message.Success),
-                Result = success ? "1" : "0",
-                Description = $"{(success ? "成功" : "失败")} 交易Id：{txId} 交易状态：{result.Status} 交易打包区块高度：{result.BlockNumber}"
-            };
-        }
-
-        private long DoubleToLong(double origin)
-        {
-            return (long) origin * 10000;
+            return await _changeStatusService.ChangeStatusAsync(input);
         }
 
         [HttpPost("list")]
@@ -355,16 +226,16 @@ namespace RuralAssets.WebApplication.Controllers
             {
                 response.List.Add(new AssetDto
                 {
-                    AssetId = ParseToInt(dataReader, 0),
+                    AssetId = CommonHelper.ParseToInt(dataReader, 0),
                     PC = dataReader[1]?.ToString() ?? string.Empty,
                     PCH = dataReader[2]?.ToString() ?? string.Empty,
-                    XMMCId = ParseToInt(dataReader, 3),
+                    XMMCId = CommonHelper.ParseToInt(dataReader, 3),
                     XMMCMS = dataReader[4]?.ToString() ?? string.Empty,
                     Name = dataReader[5]?.ToString() ?? string.Empty,
                     SFZH = dataReader[6]?.ToString() ?? string.Empty,
                     LXFS = dataReader[7]?.ToString() ?? string.Empty,
                     KHYH = dataReader[8]?.ToString() ?? string.Empty,
-                    ZHXZId = ParseToInt(dataReader, 9),
+                    ZHXZId = CommonHelper.ParseToInt(dataReader, 9),
                     ZHXZMS = dataReader[10]?.ToString() ?? string.Empty,
                     ZCHMJ = dataReader[11]?.ToString() ?? string.Empty,
                     BCZJE = dataReader[12]?.ToString() ?? string.Empty,
@@ -413,7 +284,7 @@ namespace RuralAssets.WebApplication.Controllers
                 Msg = MessageHelper.GetMessage(message),
                 AssetId = input.AssetId,
                 BlockId = dataReader[1]?.ToString() ?? string.Empty,
-                Id = ParseToInt(dataReader, 2),
+                Id = CommonHelper.ParseToInt(dataReader, 2),
                 SKR = dataReader[3]?.ToString() ?? string.Empty,
                 SFZH = dataReader[4]?.ToString() ?? string.Empty,
                 LXFS = dataReader[5]?.ToString() ?? string.Empty,
@@ -429,30 +300,30 @@ namespace RuralAssets.WebApplication.Controllers
                 XZ = dataReader[15]?.ToString() ?? string.Empty,
                 NZ = dataReader[16]?.ToString() ?? string.Empty,
                 BF = dataReader[17]?.ToString() ?? string.Empty,
-                ZCHMJ = ParseToDouble(dataReader, 18),
-                DTZW = ParseToDouble(dataReader, 19),
-                SC = ParseToDouble(dataReader, 20),
-                JJZW = ParseToDouble(dataReader, 21),
-                SM = ParseToDouble(dataReader, 22),
-                SMZ = ParseToInt(dataReader, 23),
-                DPZW = ParseToDouble(dataReader, 24),
+                ZCHMJ = CommonHelper.ParseToDouble(dataReader, 18),
+                DTZW = CommonHelper.ParseToDouble(dataReader, 19),
+                SC = CommonHelper.ParseToDouble(dataReader, 20),
+                JJZW = CommonHelper.ParseToDouble(dataReader, 21),
+                SM = CommonHelper.ParseToDouble(dataReader, 22),
+                SMZ = CommonHelper.ParseToInt(dataReader, 23),
+                DPZW = CommonHelper.ParseToDouble(dataReader, 24),
                 QT = dataReader[25]?.ToString() ?? string.Empty,
-                TDSYJ = ParseToDouble(dataReader, 26),
-                DTZWJE = ParseToDouble(dataReader, 27),
-                SCJE = ParseToDouble(dataReader, 28),
-                QTZWJE = ParseToDouble(dataReader, 29),
-                DPZWJE = ParseToDouble(dataReader, 30),
-                QTFZWJE = ParseToDouble(dataReader, 31),
-                BCZJE = ParseToDouble(dataReader, 32),
+                TDSYJ = CommonHelper.ParseToDouble(dataReader, 26),
+                DTZWJE = CommonHelper.ParseToDouble(dataReader, 27),
+                SCJE = CommonHelper.ParseToDouble(dataReader, 28),
+                QTZWJE = CommonHelper.ParseToDouble(dataReader, 29),
+                DPZWJE = CommonHelper.ParseToDouble(dataReader, 30),
+                QTFZWJE = CommonHelper.ParseToDouble(dataReader, 31),
+                BCZJE = CommonHelper.ParseToDouble(dataReader, 32),
                 ZJEDX = dataReader[33]?.ToString() ?? string.Empty,
                 FJ = dataReader[34]?.ToString() ?? string.Empty,
                 BZ = dataReader[35]?.ToString() ?? string.Empty,
                 CJSJ = dataReader[36]?.ToString() ?? string.Empty,
                 CJR = dataReader[37]?.ToString() ?? string.Empty,
                 BFZT = dataReader[38]?.ToString() ?? string.Empty,
-                SFSC = ParseToDouble(dataReader, 39),
+                SFSC = CommonHelper.ParseToDouble(dataReader, 39),
                 HTFJ = dataReader[40]?.ToString() ?? string.Empty,
-                TDBCMXPC = ParseToDouble(dataReader, 41),
+                TDBCMXPC = CommonHelper.ParseToDouble(dataReader, 41),
                 Dealno = dataReader[42]?.ToString() ?? string.Empty,
                 XMMC = dataReader[43]?.ToString() ?? string.Empty,
                 XMLX = dataReader[44]?.ToString() ?? string.Empty,
@@ -462,18 +333,6 @@ namespace RuralAssets.WebApplication.Controllers
                 LSC = dataReader[48]?.ToString() ?? string.Empty,
                 SFXX = dataReader[49]?.ToString() ?? string.Empty,
             };
-        }
-
-        private int ParseToInt(MySqlDataReader dataReader, int index)
-        {
-            return int.Parse(
-                string.IsNullOrEmpty(dataReader[index]?.ToString()) ? "0" : dataReader[index].ToString());
-        }
-
-        private double ParseToDouble(MySqlDataReader dataReader, int index)
-        {
-            return double.Parse(
-                string.IsNullOrEmpty(dataReader[index]?.ToString()) ? "0" : dataReader[index].ToString());
         }
     }
 }

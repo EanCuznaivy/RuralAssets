@@ -14,8 +14,7 @@ namespace RuralAssets.WebApplication
 
     public class AssetInChain
     {
-        [JsonPropertyName("asset_id")]
-        public int AssetId { get; set; }
+        [JsonPropertyName("asset_id")] public int AssetId { get; set; }
 
         /// <summary>
         /// 状态
@@ -53,7 +52,7 @@ namespace RuralAssets.WebApplication
         /// <summary>
         /// 贷款协议
         /// </summary>
-        [JsonPropertyName("loan_agreement")]
-        public string LoanAgreement { get; set; }
+        [JsonPropertyName("loan_agreement_hash")]
+        public string LoanAgreementHash { get; set; }
     }
 }
