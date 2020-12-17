@@ -75,6 +75,7 @@ namespace RuralAssets.WebApplication
                 stringBuilder.Append(t.ToString("x2"));
             }
             var hashMD5 = stringBuilder.ToString();
+            stream.Seek(0, SeekOrigin.Begin);
             await using var fs = new FileStream(path, FileMode.Create);
             await stream.CopyToAsync(fs); 
             return hashMD5;
