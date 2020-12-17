@@ -8,17 +8,17 @@ namespace RuralAssets.WebApplication
 
         [JsonPropertyName("idcard")] public string IdCard { get; set; }
 
-        [JsonPropertyName("asset_type")] public int AssetType { get; set; }
+        [JsonPropertyName("asset_type")] public string AssetType { get; set; }
 
-        [JsonPropertyName("pageno")] public int PageNo { get; set; }
+        [JsonPropertyName("pageno")] public string PageNo { get; set; }
 
-        [JsonPropertyName("pagesize")] public int PageSize { get; set; }
+        [JsonPropertyName("pagesize")] public string PageSize { get; set; }
 
         /// <summary>
         /// 资产Id
         /// </summary>
         [JsonPropertyName("asset_id")]
-        public int AssetId { get; set; }
+        public string AssetId { get; set; }
 
         /// <summary>
         /// 拨付状态
@@ -29,7 +29,7 @@ namespace RuralAssets.WebApplication
         /// 5 - 撤销成功
         /// </summary>
         [JsonPropertyName("bfzt")]
-        public double BFZT { get; set; }
+        public string BFZT { get; set; }
 
         /// <summary>
         /// 隶属县编码

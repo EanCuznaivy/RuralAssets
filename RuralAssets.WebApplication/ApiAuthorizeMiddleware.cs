@@ -4,64 +4,65 @@ using System.IO;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
+using System.Threading.Tasks;
+using AElf;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using Volo.Abp.Threading;
 using Volo.Abp.Caching;
-using Volo.Abp.Json;
 
 namespace RuralAssets.WebApplication
 {
-    public class AuthorizeFilter : IAuthorizationFilter
+    public class ApiAuthorizeMiddleware
     {
-        private readonly IDistributedCache<NonceCache> _nonceCache;
-        private readonly IJsonSerializer _jsonSerializer;
-        private readonly ApiAuthorizeOptions _apiAuthorizeOptions;
+        private readonly RequestDelegate _next;
 
-        public AuthorizeFilter(IDistributedCache<NonceCache> nonceCache, IJsonSerializer jsonSerializer,
-            IOptionsSnapshot<ApiAuthorizeOptions> apiAuthorizeOptions)
+        public ApiAuthorizeMiddleware(RequestDelegate next)
         {
-            _nonceCache = nonceCache;
-            _jsonSerializer = jsonSerializer;
-            _apiAuthorizeOptions = apiAuthorizeOptions.Value;
+            _next = next;
         }
 
-        public void OnAuthorization(AuthorizationFilterContext context)
+        public async Task Invoke(HttpContext context, ICryptoService cryptoService,
+            IDistributedCache<NonceCache> nonceCache, IOptionsSnapshot<ApiAuthorizeOptions> apiAuthorizeOptions,
+            IOptionsSnapshot<ModuleConfigOptions> moduleOptions)
         {
-            var request = context.HttpContext.Request;
-
-            request.Headers.TryGetValue("appid", out var appId);
-            request.Headers.TryGetValue("nonce", out var nonce);
-            request.Headers.TryGetValue("timestamp", out var timestamp);
-            request.Headers.TryGetValue("signature", out var signature);
-
-            string requestBody;
-            using (var stream = new StreamReader(request.Body))
+            if (context.Request.Path.Value.StartsWith("/api", StringComparison.OrdinalIgnoreCase) &&
+                moduleOptions.Value.EnableAuthorization)
             {
-                //stream.BaseStream.Position = 0;
-                requestBody = AsyncHelper.RunSync(stream.ReadToEndAsync);
-            }
+                var request = context.Request;
+                request.Headers.TryGetValue("appid", out var appId);
+                request.Headers.TryGetValue("nonce", out var nonce);
+                request.Headers.TryGetValue("timestamp", out var timestamp);
+                request.Headers.TryGetValue("signature", out var signature);
 
-            var verifyResult = VerifySignature(appId, Convert.ToInt64(timestamp), nonce, signature, request.Query,
-                requestBody);
-            if (!verifyResult)
-            {
-                var message = MessageHelper.Message.AuthorizeFailed;
-                context.Result = new JsonResult(new ResponseDto
+                string requestBody;
+                using (var stream = new StreamReader(request.Body))
                 {
-                    Code = MessageHelper.GetCode(message),
-                    Msg = MessageHelper.GetMessage(message)
-                });
-            }
-        }
+                    requestBody = await stream.ReadToEndAsync();
+                }
 
+                var verifyResult = VerifySignature(appId, Convert.ToInt64(timestamp), nonce, signature, request.Query,
+                    requestBody, nonceCache, apiAuthorizeOptions.Value);
+                if (!verifyResult)
+                {
+                    var result = new ResponseDto
+                    {
+                        Code = cryptoService.Encrypt(MessageHelper.GetCode(MessageHelper.Message.AuthorizeFailed)),
+                        Msg = cryptoService.Encrypt(MessageHelper.GetMessage(MessageHelper.Message.AuthorizeFailed))
+                    };
+                    context.Response.ContentType = "application/json; charset=utf-8; v=1.0";
+                    await context.Response.WriteAsync(JsonConvert.SerializeObject(result), Encoding.UTF8);
+                    return;
+                }
+            }
+
+            await _next(context);
+        }
+        
         private bool VerifySignature(string appId, long timestamp, string nonce, string signature,
-            IQueryCollection query, string body)
+            IQueryCollection query, string body, IDistributedCache<NonceCache> nonceCache,ApiAuthorizeOptions apiAuthorizeOptions)
         {
             var time = DateTimeOffset.FromUnixTimeMilliseconds(timestamp);
             var utcNow = DateTimeOffset.UtcNow;
@@ -71,7 +72,7 @@ namespace RuralAssets.WebApplication
             }
 
             var nonceExist = true;
-            _nonceCache.GetOrAdd(nonce, () =>
+            nonceCache.GetOrAdd(nonce, () =>
             {
                 nonceExist = false;
                 return new NonceCache {Nonce = nonce, Timestamp = time};
@@ -103,14 +104,14 @@ namespace RuralAssets.WebApplication
 
             var messageBytes = Encoding.UTF8.GetBytes(message);
 
-            var appsecret = _apiAuthorizeOptions.AppAccount[appId];
+            var appsecret = apiAuthorizeOptions.AppAccount[appId];
             byte[] computedSignature;
             using (var hmac = new HMACSHA256(Encoding.UTF8.GetBytes(appsecret)))
             {
                 computedSignature = hmac.ComputeHash(messageBytes);
             }
 
-            if (Convert.ToBase64String(computedSignature) != signature)
+            if (computedSignature.ToHex() != signature)
             {
                 return false;
             }
@@ -131,7 +132,10 @@ namespace RuralAssets.WebApplication
             }
             else if (obj is JArray jArray)
             {
-                sortedString = _jsonSerializer.Serialize(jArray);
+                foreach (var o in jArray)
+                {
+                    sortedString += GetSortedString(o);
+                }
             }
             else
             {
@@ -141,7 +145,7 @@ namespace RuralAssets.WebApplication
             return sortedString;
         }
     }
-
+    
     public class NonceCache
     {
         public string Nonce { get; set; }

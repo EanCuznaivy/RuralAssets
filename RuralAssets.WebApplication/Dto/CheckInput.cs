@@ -11,7 +11,7 @@ namespace RuralAssets.WebApplication
         public string IdCard { get; set; }
 
         [JsonPropertyName("asset_type")]
-        public int AssetType { get; set; }
+        public string AssetType { get; set; }
 
         [JsonPropertyName("year")]
         public string Year { get; set; }
