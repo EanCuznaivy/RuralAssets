@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Net.Http;
@@ -210,8 +211,8 @@ namespace RuralAssets.WebApplication.Controllers
                     Description = "分页数据不可为负数"
                 };
             }
-            if (input.PageSize == 0)
-                input.PageSize = 100;
+            if (pageSize == 0)
+                pageSize = 100;
 
             // TODO: Type check.
 
