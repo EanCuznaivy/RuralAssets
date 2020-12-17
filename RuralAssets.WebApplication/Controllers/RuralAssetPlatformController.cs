@@ -208,6 +208,7 @@ namespace RuralAssets.WebApplication.Controllers
                     Description = "分页数据不可为负数"
                 };
             }
+
             if (input.PageSize == 0)
                 input.PageSize = 100;
 
@@ -337,23 +338,24 @@ namespace RuralAssets.WebApplication.Controllers
         }
 
         [HttpPost("upload")]
-        public async Task<ResponseDto> UploadAsync([FromForm] UploadInput input)
+        public async Task<UploadResponseDto> UploadAsync([FromForm] UploadInput input)
         {
             var message = MessageHelper.Message.Success;
             var errorMsg = _fileValidationService.ValidateFile(input);
             if (errorMsg != string.Empty)
             {
                 message = MessageHelper.Message.FailToUploadFile;
-                return new ResponseDto
+                return new UploadResponseDto
                 {
                     Code = MessageHelper.GetCode(message),
                     Msg = MessageHelper.GetMessage(message),
                     Description = errorMsg
                 };
             }
+
             var fileInfo = await _fileValidationService.SaveFileInfoAsync(input);
             var result = _fileValidationService.RecordTransactionToBlockChain(fileInfo);
-            return new ResponseDto
+            return new UploadResponseDto
             {
                 Code = MessageHelper.GetCode(message),
                 Msg = MessageHelper.GetMessage(message),
@@ -364,7 +366,5 @@ namespace RuralAssets.WebApplication.Controllers
                 TransactionId = result.TransactionId
             };
         }
-
-       
     }
 }
