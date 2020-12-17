@@ -51,7 +51,7 @@ namespace RuralAssets.WebApplication
         {
             MakeSureSaveDirExist();
             var file = input.LoanFile;
-            var fileId = GenerateFileId(input.IdCard, input.LoanId, file.FileName, input.FileType, input.AssetId,
+            var fileId = GenerateFileId(input.IdCard, input.LoanId, Path.GetFileName(file.FileName), input.FileType, input.AssetId,
                 input.AssetType);
             var fileName = fileId.TrimStart('"').TrimEnd('"');
             var path = Path.Combine(_configOptions.FileSaveDir, fileName);
