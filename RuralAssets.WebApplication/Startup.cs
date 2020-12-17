@@ -29,6 +29,8 @@ namespace RuralAssets.WebApplication
 
             services.AddApplication<AbpAspNetCoreModule>();
             services.AddTransient<IValidationService, ValidationService>();
+            services.AddTransient<IChangeStatusService, ChangeStatusService>();
+            services.AddTransient<IFileValidationService, FileValidationService>();
             services.AddSingleton<IDistributedCacheSerializer, Utf8JsonDistributedCacheSerializer>();
             services.AddSingleton<IDistributedCacheKeyNormalizer, DistributedCacheKeyNormalizer>();
             services.AddSingleton(typeof(IDistributedCache<>), typeof(DistributedCache<>));
@@ -50,6 +52,7 @@ namespace RuralAssets.WebApplication
                 options =>
                 {
                     options.SwaggerDoc("v1", new OpenApiInfo {Title = "Rural Assets Platform API", Version = "v1"});
+                    options.OperationFilter<SwaggerFileUploadFilter>();
                     options.DocInclusionPredicate((docName, description) => true);
                     options.CustomSchemaIds(type => type.FullName);
                 }

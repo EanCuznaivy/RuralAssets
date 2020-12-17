@@ -11,7 +11,8 @@ namespace RuralAssets.WebApplication
             ParameterMissed,
             ParameterTypeNotMatch,
             Unsupport,
-            AuthorizeFailed
+            AuthorizeFailed,
+            FailToUploadFile
         }
 
         public static string GetCode(Message message)
@@ -35,6 +36,9 @@ namespace RuralAssets.WebApplication
 
                 case Message.AuthorizeFailed:
                     return "0006";
+                
+                case Message.FailToUploadFile:
+                    return "0007";
 
                 default:
                     return "0001";
@@ -62,6 +66,9 @@ namespace RuralAssets.WebApplication
 
                 case Message.AuthorizeFailed:
                     return "验签失败";
+                
+                case Message.FailToUploadFile:
+                    return "上传文件失败";
 
                 default:
                     return "系统异常（其他所有未列出的异常）";

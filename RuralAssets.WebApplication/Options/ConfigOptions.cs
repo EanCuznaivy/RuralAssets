@@ -8,5 +8,7 @@ namespace RuralAssets.WebApplication
         public string AccountAddress { get; set; }
         public string AccountPassword { get; set; }
         public string RuralContractAddress { get; set; }
+        
+        public string FileSaveDir { get; set; }
     }
 }

@@ -14,8 +14,7 @@ namespace RuralAssets.WebApplication
 
     public class AssetInChain
     {
-        [JsonPropertyName("asset_id")]
-        public int AssetId { get; set; }
+        [JsonPropertyName("asset_id")] public int AssetId { get; set; }
 
         /// <summary>
         /// 状态
@@ -31,6 +30,12 @@ namespace RuralAssets.WebApplication
         /// </summary>
         [JsonPropertyName("bank_id")]
         public string BankId { get; set; }
+        
+        /// <summary>
+        /// 银行贷款编号
+        /// </summary>
+        [JsonPropertyName("loan_id")]
+        public string LoanId { get; set; }
 
         /// <summary>
         /// 放款金额
@@ -49,11 +54,40 @@ namespace RuralAssets.WebApplication
         /// </summary>
         [JsonPropertyName("loan_rate")]
         public double LoanRate { get; set; }
-
+        
         /// <summary>
-        /// 贷款协议
+        /// 贷款相关文件列表
         /// </summary>
-        [JsonPropertyName("loan_agreement")]
-        public string LoanAgreement { get; set; }
+        [JsonPropertyName("loan_file")]
+        public List<LoanFile> LoanFiles { get; set; }
+        
+        
+    }
+
+    public class LoanFile
+    {
+        /// <summary>
+        /// file_type
+        /// </summary>
+        [JsonPropertyName("file_type")]
+        public string FileType { get; set; }
+        
+        /// <summary>
+        /// 贷款文件类型
+        /// </summary>
+        [JsonPropertyName("file_id")] 
+        public string FileId { get; set; }
+        
+        /// <summary>
+        /// 文件hash值
+        /// </summary>
+        [JsonPropertyName("file_hash")] 
+        public string FileHash { get; set; }
+        
+        /// <summary>
+        /// 文件上传后的区块链交易ID
+        /// </summary>
+        [JsonPropertyName("transaction_id")] 
+        public string TransactionId { get; set; }
     }
 }
