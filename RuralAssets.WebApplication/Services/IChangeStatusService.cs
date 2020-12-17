@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using AElf.Client.Dto;
 using AElf.Contracts.Assets;
+using Google.Protobuf.WellKnownTypes;
 using Microsoft.Extensions.Options;
 using MySql.Data.MySqlClient;
 

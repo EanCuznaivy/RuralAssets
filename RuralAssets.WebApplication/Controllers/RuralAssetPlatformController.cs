@@ -1,13 +1,10 @@
-using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text.Json;
 using System.Text.Unicode;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -22,16 +19,18 @@ namespace RuralAssets.WebApplication.Controllers
         private readonly ILogger<RuralAssetPlatformController> _logger;
         private readonly IValidationService _validationService;
         private readonly IChangeStatusService _changeStatusService;
+        private readonly IFileValidationService _fileValidationService;
         private readonly ConfigOptions _configOptions;
 
         public RuralAssetPlatformController(ILogger<RuralAssetPlatformController> logger,
             IValidationService validationService, IOptionsSnapshot<ConfigOptions> configOptions,
-            IChangeStatusService changeStatusService)
+            IChangeStatusService changeStatusService, IFileValidationService fileValidationService)
         {
             _logger = logger;
             _validationService = validationService;
             _changeStatusService = changeStatusService;
             _configOptions = configOptions.Value;
+            _fileValidationService = fileValidationService;
         }
 
         [HttpPost("check")]
@@ -340,26 +339,32 @@ namespace RuralAssets.WebApplication.Controllers
         [HttpPost("upload")]
         public async Task<ResponseDto> UploadAsync([FromForm] UploadInput input)
         {
-            var file = input.LoanFile;
-            if (file == null)
+            var message = MessageHelper.Message.Success;
+            var errorMsg = _fileValidationService.ValidateFile(input);
+            if (errorMsg != string.Empty)
             {
+                message = MessageHelper.Message.FailToUploadFile;
                 return new ResponseDto
                 {
-                    Msg = "文件为空"
+                    Code = MessageHelper.GetCode(message),
+                    Msg = MessageHelper.GetMessage(message),
+                    Description = errorMsg
                 };
             }
-
-            var path = Path.Combine(CommonHelper.GetDefaultDataDir(), file.FileName);
-            var stream = file.OpenReadStream();
-            stream.Seek(0, SeekOrigin.Begin);
-            await using(var fs = new FileStream(path, FileMode.Create))
-            {
-                await stream.CopyToAsync(fs);
-            }
+            var fileInfo = await _fileValidationService.SaveFileInfoAsync(input);
+            var result = _fileValidationService.RecordTransactionToBlockChain(fileInfo);
             return new ResponseDto
             {
-                
+                Code = MessageHelper.GetCode(message),
+                Msg = MessageHelper.GetMessage(message),
+                Description =
+                    $"交易Id：{result.TransactionId} 交易状态：{result.Status} 交易打包区块高度：{result.BlockNumber}",
+                FileId = fileInfo.FileId,
+                FileHash = fileInfo.FileHash,
+                TransactionId = result.TransactionId
             };
         }
+
+       
     }
 }
