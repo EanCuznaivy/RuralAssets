@@ -1,6 +1,7 @@
 using System.Globalization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Versioning;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -35,6 +36,7 @@ namespace RuralAssets.WebApplication
             services.AddSingleton(typeof(IDistributedCache<>), typeof(DistributedCache<>));
             services.AddSingleton<NonceCache>();
             services.AddTransient<IApiDescriptionModelProvider, AspNetCoreApiDescriptionModelProvider>();
+            services.AddTransient<ICryptoService,AesCryptoService>();
             services.AddControllers();
             services.AddApiVersioning(options =>
             {
@@ -44,6 +46,7 @@ namespace RuralAssets.WebApplication
                 options.UseApiBehavior = false;
             });
             services.AddVersionedApiExplorer();
+            services.AddDistributedMemoryCache();
 
             services.AddSwaggerGen(
                 options =>
@@ -61,12 +64,9 @@ namespace RuralAssets.WebApplication
             {
                 options.EnableAuthorization = configuration.GetValue<bool>("EnableAuthorization");
                 options.EnableIdCardCheck = configuration.GetValue<bool>("EnableIdCardCheck");
+                options.CryptoKey = configuration.GetValue<string>("CryptoKey");
+                options.EnableCrypto = configuration.GetValue<bool>("EnableCrypto");
             });
-
-            if (configuration.GetValue<bool>("EnableAuthorization"))
-            {
-                services.AddMvc(mvc => mvc.Filters.Add<AuthorizeFilter>());
-            }
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -74,6 +74,8 @@ namespace RuralAssets.WebApplication
         {
             var cultureInfo = CultureInfo.InvariantCulture;
             CultureInfo.DefaultThreadCurrentCulture = cultureInfo;
+            app.UseMiddleware<ApiAuthorizeMiddleware>();
+            app.UseMiddleware<ApiCryptoMiddleware>();
             app.UseHttpsRedirection();
             app.UseRouting();
             app.UseAuthorization();
@@ -82,7 +84,6 @@ namespace RuralAssets.WebApplication
             app.UseSwagger();
             app.UseSwaggerUI(options => { options.SwaggerEndpoint("/swagger/v1/swagger.json", "AssetPlatform API"); });
             app.UseConfiguredEndpoints();
-            //app.UseMiddleware<SecurityMiddleware>();
         }
     }
 }
