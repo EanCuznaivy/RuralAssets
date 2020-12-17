@@ -53,7 +53,7 @@ namespace RuralAssets.WebApplication
             var file = input.LoanFile;
             var fileId = GenerateFileId(input.IdCard, input.LoanId, file.FileName, input.FileType, input.AssetId,
                 input.AssetType);
-            var fileName = fileId + file.FileName;
+            var fileName = fileId.TrimStart('"').TrimEnd('"');
             var path = Path.Combine(_configOptions.FileSaveDir, fileName);
             var fileHash = await SaveAndCalculateMD5Async(path, file);
             return new FileSavedInfo
