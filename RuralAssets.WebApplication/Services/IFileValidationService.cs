@@ -18,7 +18,7 @@ namespace RuralAssets.WebApplication
         TransactionResultDto RecordTransactionToBlockChain(FileSavedInfo fileInfo);
     }
 
-    public class FileValidationService
+    public class FileValidationService : IFileValidationService
     {
         private readonly ConfigOptions _configOptions;
 
