@@ -6,6 +6,6 @@ namespace RuralAssets.WebApplication
     {
         [JsonPropertyName("name")] public string Name { get; set; }
         [JsonPropertyName("idcard")] public string IdCard { get; set; }
-        [JsonPropertyName("asset_type")] public int AssetType { get; set; }
+        [JsonPropertyName("asset_type")] public string AssetType { get; set; }
     }
 }

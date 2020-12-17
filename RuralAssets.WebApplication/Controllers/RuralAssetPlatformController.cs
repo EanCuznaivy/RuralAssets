@@ -306,7 +306,7 @@ namespace RuralAssets.WebApplication.Controllers
                 };
             }
 
-            if (input.AssetType != 1 && input.AssetType != 2)
+            if (input.AssetType != "1" && input.AssetType != "2")
             {
                 message = MessageHelper.Message.ParameterMissed;
                 return new ListResponseDto
@@ -316,7 +316,9 @@ namespace RuralAssets.WebApplication.Controllers
                 };
             }
 
-            if (input.PageNo < 0 || input.PageSize < 0)
+            var pageNo = Convert.ToInt32(input.PageNo);
+            var pageSize = Convert.ToInt32(input.PageSize);
+            if (pageNo < 0 || pageSize < 0)
             {
                 message = MessageHelper.Message.ParameterTypeNotMatch;
                 return new ListResponseDto
@@ -335,8 +337,8 @@ namespace RuralAssets.WebApplication.Controllers
                 Msg = MessageHelper.GetMessage(message),
                 List = new List<AssetDto>()
             };
-            var sql = SqlStatementHelper.GetListSql(input.Name, input.IdCard, input.AssetId, input.BFZT, input.LSX,
-                input.LSXZ, input.LSC, input.PageNo, input.PageSize == 0 ? 100 : input.PageSize);
+            var sql = SqlStatementHelper.GetListSql(input.Name, input.IdCard, Convert.ToInt32(input.AssetId),
+                Convert.ToDouble(input.BFZT), input.LSX, input.LSXZ, input.LSC, pageNo, pageSize == 0 ? 100 : pageSize);
             var dataReader =
                 await MySqlHelper.ExecuteReaderAsync(_configOptions.RuralAssetsConnectString, sql);
             while (dataReader.Read())
@@ -380,8 +382,9 @@ namespace RuralAssets.WebApplication.Controllers
                 };
             }
 
-            if (string.IsNullOrEmpty(input.Name) || string.IsNullOrEmpty(input.Idcard) || input.AssetId == 0 ||
-                (input.AssetType != 1 && input.AssetType != 2))
+            var assetId = Convert.ToInt32(input.AssetId);
+            if (string.IsNullOrEmpty(input.Name) || string.IsNullOrEmpty(input.Idcard) || assetId == 0 ||
+                (input.AssetType != "1" && input.AssetType != "2"))
             {
                 message = MessageHelper.Message.ParameterMissed;
                 return new DetailsResponseDto
@@ -391,7 +394,7 @@ namespace RuralAssets.WebApplication.Controllers
                 };
             }
 
-            var sql = SqlStatementHelper.GetDetailSql(input.Name, input.Idcard, input.AssetId);
+            var sql = SqlStatementHelper.GetDetailSql(input.Name, input.Idcard, assetId);
             var dataReader =
                 await MySqlHelper.ExecuteReaderAsync(_configOptions.RuralAssetsConnectString, sql);
             dataReader.Read();
@@ -399,7 +402,7 @@ namespace RuralAssets.WebApplication.Controllers
             {
                 Code = MessageHelper.GetCode(message),
                 Msg = MessageHelper.GetMessage(message),
-                AssetId = input.AssetId,
+                AssetId = assetId,
                 BlockId = dataReader[1]?.ToString() ?? string.Empty,
                 Id = ParseToInt(dataReader, 2),
                 SKR = dataReader[3]?.ToString() ?? string.Empty,
