@@ -53,8 +53,7 @@ namespace RuralAssets.WebApplication
             var file = input.LoanFile;
             var fileId = GenerateFileId(input.IdCard, input.LoanId, input.FileType, input.AssetId,
                 input.AssetType);
-            var fileName = fileId.TrimStart('"').TrimEnd('"');
-            var path = Path.Combine(_configOptions.FileSaveDir, fileName);
+            var path = Path.Combine(_configOptions.FileSaveDir, fileId);
             var fileHash = await SaveAndCalculateMD5Async(path, file);
             return new FileSavedInfo
             {
@@ -109,7 +108,7 @@ namespace RuralAssets.WebApplication
             {
                 Value = idCard + loanId + fileType + assetId + assetType
             };
-            return HashHelper.ComputeFrom(fileInfo).ToString();
+            return HashHelper.ComputeFrom(fileInfo).ToString().TrimStart('"').TrimEnd('"');
         }
     }
 }
