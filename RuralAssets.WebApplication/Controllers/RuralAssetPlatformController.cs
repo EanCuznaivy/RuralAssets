@@ -222,8 +222,11 @@ namespace RuralAssets.WebApplication.Controllers
                 Msg = MessageHelper.GetMessage(message),
                 List = new List<AssetDto>()
             };
+            var bfzt = 1;
+            int.TryParse(input.BFZT, out bfzt);
             var sql = SqlStatementHelper.GetListSql(input.Name, input.IdCard, Convert.ToInt32(input.AssetId),
-                Convert.ToDouble(input.BFZT), input.LSX, input.LSXZ, input.LSC, pageNo, pageSize == 0 ? 100 : pageSize);
+                bfzt, input.LSX, input.LSXZ, input.LSC, pageNo, pageSize == 0 ? 100 : pageSize);
+            _logger.LogInformation(sql);
             var dataReader =
                 await MySqlHelper.ExecuteReaderAsync(_configOptions.RuralAssetsConnectString, sql);
             while (dataReader.Read())

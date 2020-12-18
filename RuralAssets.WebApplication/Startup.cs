@@ -74,8 +74,8 @@ namespace RuralAssets.WebApplication
         {
             var cultureInfo = CultureInfo.InvariantCulture;
             CultureInfo.DefaultThreadCurrentCulture = cultureInfo;
-            app.UseMiddleware<ApiAuthorizeMiddleware>();
-            app.UseMiddleware<ApiCryptoMiddleware>();
+            //app.UseMiddleware<ApiAuthorizeMiddleware>();
+            //app.UseMiddleware<ApiCryptoMiddleware>();
             app.UseHttpsRedirection();
             app.UseRouting();
             app.UseAuthorization();

@@ -87,7 +87,7 @@ VALUES
 )";
         }
         
-        public static string GetListSql(string name, string idCard, int assetId, double bfzt, string lsx,
+        public static string GetListSql(string name, string idCard, int assetId, int bfzt, string lsx,
             string lsxz, string lsc, int pageNo, int pageSize)
         {
             return $@"
@@ -98,7 +98,7 @@ select
             left join entity_xmxxgl d on a.xmmc = d.id      /**关联项目信息**/
             left join entity_bcmxsc e on a.tdbcmxpc = e.id  /**关联补偿批次信息**/
             left join lborganization f on f.id = e.lsc      /**关联县镇村地域信息**/
-            where
+            where 1 = 1
 " + 
                    (string.IsNullOrEmpty(name)
                        ? ""
