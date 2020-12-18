@@ -51,7 +51,7 @@ namespace RuralAssets.WebApplication
         {
             MakeSureSaveDirExist();
             var file = input.LoanFile;
-            var fileId = GenerateFileId(input.IdCard, input.LoanId, Path.GetFileName(file.FileName), input.FileType, input.AssetId,
+            var fileId = GenerateFileId(input.IdCard, input.LoanId, input.FileType, input.AssetId,
                 input.AssetType);
             var fileName = fileId.TrimStart('"').TrimEnd('"');
             var path = Path.Combine(_configOptions.FileSaveDir, fileName);
@@ -102,12 +102,12 @@ namespace RuralAssets.WebApplication
                 Directory.CreateDirectory(_configOptions.FileSaveDir);
         }
 
-        private static string GenerateFileId(string idCard, string loanId, string fileName, string fileType,
+        private static string GenerateFileId(string idCard, string loanId, string fileType,
             int assetId, int assetType)
         {
             var fileInfo = new StringValue
             {
-                Value = idCard + loanId + fileName + fileType + assetId + assetType
+                Value = idCard + loanId + fileType + assetId + assetType
             };
             return HashHelper.ComputeFrom(fileInfo).ToString();
         }
