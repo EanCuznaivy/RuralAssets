@@ -2,7 +2,7 @@ using System.Text.Json.Serialization;
 
 namespace RuralAssets.WebApplication
 {
-    public class ResponseDto
+    public class UploadResponseDto
     {
         [JsonPropertyName("code")] public string Code { get; set; }
 
@@ -11,5 +11,11 @@ namespace RuralAssets.WebApplication
         [JsonPropertyName("result")] public string Result { get; set; }
 
         [JsonPropertyName("description")] public string Description { get; set; }
+        
+        [JsonPropertyName("file_id")] public string FileId { get; set; }
+        
+        [JsonPropertyName("file_hash")] public string FileHash { get; set; }
+        
+        [JsonPropertyName("transaction_id")] public string TransactionId { get; set; }
     }
 }
