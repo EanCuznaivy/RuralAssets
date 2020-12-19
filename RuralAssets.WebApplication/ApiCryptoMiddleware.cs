@@ -42,7 +42,7 @@ namespace RuralAssets.WebApplication
             }
 
 
-            var requestJson = JsonConvert.SerializeObject(HandleJson(cryptoService.Decrypt, string.Empty,
+            var requestJson = JsonConvert.SerializeObject(HandleJson(cryptoService.Decrypt, 
                 JsonConvert.DeserializeObject(requestContent)));
             using (var requestStream = new MemoryStream(Encoding.UTF8.GetBytes(requestJson)))
             {
@@ -63,45 +63,13 @@ namespace RuralAssets.WebApplication
                     }
                 }
 
-                var responseJson = JsonConvert.SerializeObject(HandleJson(cryptoService.Encrypt, string.Empty,
+                var responseJson = JsonConvert.SerializeObject(HandleJson(cryptoService.Encrypt, 
                     JsonConvert.DeserializeObject(responseJsonResult)));
                 using (var responseStream = new MemoryStream(Encoding.UTF8.GetBytes(responseJson)))
                 {
                     await responseStream.CopyToAsync(originalBodyStream);
                 }
             }
-        }
-
-        private JObject HandleJson(Func<string, string> cryptoFunc, string key, object value)
-        {
-            var jObjectResult = new JObject();
-            if (value is JObject jObject)
-            {
-                foreach (var o in jObject)
-                {
-                    if (o.Value.HasValues)
-                    {
-                        jObjectResult.Add(o.Key, HandleJson(cryptoFunc, o.Key, o.Value));
-                    }
-                    else
-                    {
-                        jObjectResult[o.Key] = cryptoFunc(o.Value.ToString());
-                    }
-
-                }
-            }
-            else if (value is JArray jArray)
-            {
-                var jArrayResult = new JArray();
-                foreach (var o in jArray)
-                {
-                    jArrayResult.Add(HandleJson(cryptoFunc, string.Empty, o));
-                }
-
-                jObjectResult.Add(key, jArrayResult);
-            }
-
-            return jObjectResult;
         }
 
         private JToken HandleJson(Func<string, string> cryptoFunc, object obj)

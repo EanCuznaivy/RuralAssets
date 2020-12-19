@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using AElf.Client.Dto;
 using AElf.Contracts.Assets;
 using Google.Protobuf.WellKnownTypes;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using MySql.Data.MySqlClient;
 
@@ -16,11 +17,14 @@ namespace RuralAssets.WebApplication
 
     public class ChangeStatusService : IChangeStatusService
     {
+        private readonly ILogger<ChangeStatusService> _logger;
         private readonly IValidationService _validationService;
         private readonly ConfigOptions _configOptions;
 
-        public ChangeStatusService(IOptionsSnapshot<ConfigOptions> configOptions, IValidationService validationService)
+        public ChangeStatusService(ILogger<ChangeStatusService> logger, IOptionsSnapshot<ConfigOptions> configOptions,
+            IValidationService validationService)
         {
+            _logger = logger;
             _configOptions = configOptions.Value;
             _validationService = validationService;
         }
@@ -114,30 +118,39 @@ namespace RuralAssets.WebApplication
                     var cmd = conn.CreateCommand();
                     cmd.Transaction = transaction;
                     var status = int.Parse(assetInChain.Status);
-                    cmd.CommandText =
-                        SqlStatementHelper.GetChangeStatusSql(input.Name, input.IdCard, assetInChain.AssetId, status);
+                    var changeStatusSql = SqlStatementHelper.GetChangeStatusSql(input.Name, input.IdCard,
+                        assetInChain.AssetId,
+                        status);
+                    _logger.LogInformation(changeStatusSql);
+                    cmd.CommandText = changeStatusSql;
                     await cmd.ExecuteNonQueryAsync();
 
                     var dueDate = assetInChain.DueDate ?? string.Empty;
-                    cmd.CommandText = SqlStatementHelper.GetInsertToEntityTdbcLoanSql(input.Name, input.IdCard,
+                    var insertToEntityTdbcLoanSql = SqlStatementHelper.GetInsertToEntityTdbcLoanSql(input.Name,
+                        input.IdCard,
                         input.AssetType,
                         assetInChain.AssetId, status, assetInChain.LoanId, assetInChain.BankId, assetInChain.LoanAmount,
                         dueDate, assetInChain.LoanRate, transactionId);
+                    _logger.LogInformation(insertToEntityTdbcLoanSql);
+                    cmd.CommandText = insertToEntityTdbcLoanSql;
                     await cmd.ExecuteNonQueryAsync();
 
                     foreach (var loanFile in assetInChain.LoanFiles)
                     {
-                        cmd.CommandText = SqlStatementHelper.GetInsertFileInfoSql(input.Name, input.IdCard,
+                        var insertFileInfoSql = SqlStatementHelper.GetInsertFileInfoSql(input.Name, input.IdCard,
                             input.AssetType,
                             assetInChain.AssetId, loanFile.FileId, loanFile.FileType, loanFile.FileHash,
                             loanFile.TransactionId);
+                        _logger.LogInformation(insertFileInfoSql);
+                        cmd.CommandText = insertFileInfoSql;
                         await cmd.ExecuteNonQueryAsync();
                     }
 
                     transaction.Commit();
                 }
-                catch (Exception)
+                catch (Exception ex)
                 {
+                    _logger.LogError(ex.Message);
                     transaction.Rollback();
                     isSuccess = false;
                 }

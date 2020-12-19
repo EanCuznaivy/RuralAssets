@@ -1,11 +1,15 @@
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text.Json;
 using System.Text.Unicode;
 using System.Threading.Tasks;
+using AElf;
+using AElf.Client.Dto;
+using AElf.Contracts.Assets;
+using Google.Protobuf;
+using Google.Protobuf.WellKnownTypes;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -211,6 +215,7 @@ namespace RuralAssets.WebApplication.Controllers
                     Description = "分页数据不可为负数"
                 };
             }
+
             if (pageSize == 0)
                 pageSize = 100;
 
@@ -222,8 +227,9 @@ namespace RuralAssets.WebApplication.Controllers
                 Msg = MessageHelper.GetMessage(message),
                 List = new List<AssetDto>()
             };
+            int.TryParse(input.BFZT, out var bfzt);
             var sql = SqlStatementHelper.GetListSql(input.Name, input.IdCard, Convert.ToInt32(input.AssetId),
-                Convert.ToDouble(input.BFZT), input.LSX, input.LSXZ, input.LSC, pageNo, pageSize == 0 ? 100 : pageSize);
+                bfzt, input.LSX, input.LSXZ, input.LSC, pageNo, pageSize == 0 ? 100 : pageSize);
             var dataReader =
                 await MySqlHelper.ExecuteReaderAsync(_configOptions.RuralAssetsConnectString, sql);
             while (dataReader.Read())
@@ -367,6 +373,50 @@ namespace RuralAssets.WebApplication.Controllers
                 FileId = fileInfo.FileId,
                 FileHash = fileInfo.FileHash,
                 TransactionId = result.TransactionId
+            };
+        }
+
+        [HttpPost("record_json")]
+        public async Task<ResponseDto> RecordJsonAsync(RecordJsonInput input)
+        {
+            var nodeManager = new NodeManager(_configOptions.BlockChainEndpoint);
+            var txId = nodeManager.SendTransaction(_configOptions.AccountAddress, _configOptions.RuralContractAddress,
+                "RecordJsonMessage", new JsonMessage
+                {
+                    Key = input.Key,
+                    Message = input.JsonMessage
+                });
+            var result = nodeManager.CheckTransactionResult(txId);
+            var message = MessageHelper.Message.Success;
+            return new ResponseDto
+            {
+                Code = MessageHelper.GetCode(message),
+                Msg = MessageHelper.GetMessage(message),
+                Description =
+                    $"交易Id：{result.TransactionId} 交易状态：{result.Status} 交易打包区块高度：{result.BlockNumber}"
+            };
+        }
+
+        [HttpGet("get_json")]
+        public async Task<ResponseDto> GetJsonAsync(string input)
+        {
+            var nodeManager = new NodeManager(_configOptions.BlockChainEndpoint);
+            var tx = nodeManager.GenerateRawTransaction(_configOptions.AccountAddress,
+                _configOptions.RuralContractAddress,
+                "GetJsonMessage", new StringValue {Value = input});
+            var result = await nodeManager.ApiClient.ExecuteTransactionAsync(new ExecuteTransactionDto
+            {
+                RawTransaction = tx
+            });
+            var message = MessageHelper.Message.Success;
+            var json = new StringValue();
+            json.MergeFrom(ByteString.CopyFrom(ByteArrayHelper.HexStringToByteArray(result)));
+            return new ResponseDto
+            {
+                Code = MessageHelper.GetCode(message),
+                Msg = MessageHelper.GetMessage(message),
+                Result = json.Value,
+                Description = $"Key为{input}的链上数据为{json.Value}"
             };
         }
     }
