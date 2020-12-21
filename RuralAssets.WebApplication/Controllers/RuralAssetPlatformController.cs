@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text.Json;
@@ -256,6 +257,11 @@ namespace RuralAssets.WebApplication.Controllers
                 });
             }
 
+            if (!response.List.Any())
+            {
+                response.List = null;
+            }
+
             return response;
         }
 
@@ -377,7 +383,7 @@ namespace RuralAssets.WebApplication.Controllers
         }
 
         [HttpPost("record_json")]
-        public async Task<ResponseDto> RecordJsonAsync(RecordJsonInput input)
+        public ResponseDto RecordJsonAsync(RecordJsonInput input)
         {
             var nodeManager = new NodeManager(_configOptions.BlockChainEndpoint);
             var txId = nodeManager.SendTransaction(_configOptions.AccountAddress, _configOptions.RuralContractAddress,
