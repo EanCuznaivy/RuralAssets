@@ -21,7 +21,7 @@ namespace RuralAssets.WebApplication
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
                     webBuilder
-                        .UseUrls("http://0.0.0.0:7080")
+                        .UseUrls("http://localhost:7080")
                         .UseStartup<Startup>();
                 });
         }

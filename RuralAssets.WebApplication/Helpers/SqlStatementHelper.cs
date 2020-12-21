@@ -37,7 +37,7 @@ select a.skr as name,a.sfzh as idcard, 1 as asset_type,a.id as asset_id,concat_w
 ";
         }
 
-        public static string GetChangeStatusSql(string name, string idCard, int assetId, int status)
+        public static string GetChangeStatusSql(string name, string idCard, string assetId, string status)
         {
             return $@"
 UPDATE entity_tdbchmc t 
@@ -49,11 +49,11 @@ WHERE
 ";
         }
 
-        public static string GetInsertToEntityTdbcLoanSql(string name, string idCard, int assetType, int assetId,
-            int status, string loanId, string bankId, double loanAmount, string dueDate, double loanInterest,
+        public static string GetInsertToEntityTdbcLoanSql(string name, string idCard, string assetType, string assetId,
+            string status, string loanId, string bankId, string loanAmount, string dueDate, string loanInterest,
             string txId)
         {
-            var loadInterestPercent = "%" + loanInterest.ToString("P2");
+            var loadInterestPercent = "%" + loanInterest;
             return
                 $@"INSERT INTO entity_tdbcloan ( loan_name, idcard, asset_type, asset_id, loan_status, loan_id, bank_id, loan_amount, due_date, loan_rate, transaction_id)
 VALUES
@@ -71,7 +71,7 @@ VALUES
 )";
         }
 
-        public static string GetInsertFileInfoSql(string name, string idCard, int assetType, int assetId, string fileId,
+        public static string GetInsertFileInfoSql(string name, string idCard, string assetType, string assetId, string fileId,
             string fileType, string fileHash, string transactionId)
         {
             return

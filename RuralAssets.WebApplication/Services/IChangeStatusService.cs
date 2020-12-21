@@ -43,7 +43,7 @@ namespace RuralAssets.WebApplication
             }
 
             if (string.IsNullOrEmpty(input.IdCard) || string.IsNullOrEmpty(input.Name) || !input.AssetList.Any() ||
-                (input.AssetType != 1 && input.AssetType != 2))
+                (input.AssetType != "1" && input.AssetType != "2"))
             {
                 message = MessageHelper.Message.ParameterMissed;
                 return new ResponseDto
@@ -57,8 +57,10 @@ namespace RuralAssets.WebApplication
             {
                 if (assetInChain.Status == "1")
                 {
-                    if (string.IsNullOrEmpty(assetInChain.BankId) || assetInChain.LoanAmount < 0.0001 ||
-                        string.IsNullOrEmpty(assetInChain.DueDate) || assetInChain.LoanRate < 0.0001)
+                    var loanAmount = double.Parse(assetInChain.LoanAmount);
+                    var loanRate = double.Parse(assetInChain.LoanRate);
+                    if (string.IsNullOrEmpty(assetInChain.BankId) || loanAmount < 0.0001 ||
+                        string.IsNullOrEmpty(assetInChain.DueDate) || loanRate < 0.0001)
                     {
                         message = MessageHelper.Message.ParameterMissed;
                         return new ResponseDto
@@ -117,20 +119,17 @@ namespace RuralAssets.WebApplication
                 {
                     var cmd = conn.CreateCommand();
                     cmd.Transaction = transaction;
-                    var status = int.Parse(assetInChain.Status);
                     var changeStatusSql = SqlStatementHelper.GetChangeStatusSql(input.Name, input.IdCard,
                         assetInChain.AssetId,
-                        status);
+                        assetInChain.Status);
                     _logger.LogInformation(changeStatusSql);
                     cmd.CommandText = changeStatusSql;
                     await cmd.ExecuteNonQueryAsync();
 
                     var dueDate = assetInChain.DueDate ?? string.Empty;
                     var insertToEntityTdbcLoanSql = SqlStatementHelper.GetInsertToEntityTdbcLoanSql(input.Name,
-                        input.IdCard,
-                        input.AssetType,
-                        assetInChain.AssetId, status, assetInChain.LoanId, assetInChain.BankId, assetInChain.LoanAmount,
-                        dueDate, assetInChain.LoanRate, transactionId);
+                        input.IdCard, input.AssetType, assetInChain.AssetId, assetInChain.Status, assetInChain.LoanId,
+                        assetInChain.BankId, assetInChain.LoanAmount, dueDate, assetInChain.LoanRate, transactionId);
                     _logger.LogInformation(insertToEntityTdbcLoanSql);
                     cmd.CommandText = insertToEntityTdbcLoanSql;
                     await cmd.ExecuteNonQueryAsync();
@@ -138,8 +137,7 @@ namespace RuralAssets.WebApplication
                     foreach (var loanFile in assetInChain.LoanFiles)
                     {
                         var insertFileInfoSql = SqlStatementHelper.GetInsertFileInfoSql(input.Name, input.IdCard,
-                            input.AssetType,
-                            assetInChain.AssetId, loanFile.FileId, loanFile.FileType, loanFile.FileHash,
+                            input.AssetType, assetInChain.AssetId, loanFile.FileId, loanFile.FileType, loanFile.FileHash,
                             loanFile.TransactionId);
                         _logger.LogInformation(insertFileInfoSql);
                         cmd.CommandText = insertFileInfoSql;
@@ -166,21 +164,20 @@ namespace RuralAssets.WebApplication
             {
                 Name = input.Name,
                 IdCard = input.IdCard,
-                AssetType = input.AssetType,
-                AssetIdList = {input.AssetList.Select(a => a.AssetId)},
+                AssetType = int.Parse(input.AssetType),
                 AssetList =
                 {
                     input.AssetList.Select(a =>
                     {
                         var asset = new Asset
                         {
-                            AssetId = a.AssetId,
+                            AssetId = int.Parse(a.AssetId),
                             Status = a.Status,
                             BankId = a.BankId ?? string.Empty,
-                            LoanAmount = CommonHelper.DoubleToLong(a.LoanAmount),
+                            LoanAmount = CommonHelper.DoubleToLong(double.Parse(a.LoanAmount)),
                             LoanAgreementHash = string.Empty,
                             DueDate = a.DueDate ?? string.Empty,
-                            LoanRate = CommonHelper.DoubleToLong(a.LoanRate)
+                            LoanRate = CommonHelper.DoubleToLong(double.Parse(a.LoanRate))
                         };
                         return asset;
                     })

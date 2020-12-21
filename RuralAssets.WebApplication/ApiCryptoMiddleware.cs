@@ -21,7 +21,9 @@ namespace RuralAssets.WebApplication
 
         public async Task Invoke(HttpContext context, ICryptoService cryptoService)
         {
-            if (!context.Request.Path.Value.StartsWith("/api", StringComparison.OrdinalIgnoreCase))
+            var requestPath = context.Request.Path.Value;
+            if (!requestPath.StartsWith("/api", StringComparison.OrdinalIgnoreCase) ||
+                requestPath.EndsWith("upload", StringComparison.OrdinalIgnoreCase))
             {
                 await _next(context);
                 return;
@@ -41,8 +43,7 @@ namespace RuralAssets.WebApplication
                 requestContent = await reader.ReadToEndAsync();
             }
 
-
-            var requestJson = JsonConvert.SerializeObject(HandleJson(cryptoService.Decrypt, 
+            var requestJson = JsonConvert.SerializeObject(HandleJson(cryptoService.Decrypt,
                 JsonConvert.DeserializeObject(requestContent)));
             using (var requestStream = new MemoryStream(Encoding.UTF8.GetBytes(requestJson)))
             {
@@ -63,7 +64,7 @@ namespace RuralAssets.WebApplication
                     }
                 }
 
-                var responseJson = JsonConvert.SerializeObject(HandleJson(cryptoService.Encrypt, 
+                var responseJson = JsonConvert.SerializeObject(HandleJson(cryptoService.Encrypt,
                     JsonConvert.DeserializeObject(responseJsonResult)));
                 using (var responseStream = new MemoryStream(Encoding.UTF8.GetBytes(responseJson)))
                 {
