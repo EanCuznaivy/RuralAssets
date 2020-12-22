@@ -50,7 +50,7 @@ namespace RuralAssets.WebApplication
                 request.Headers.TryGetValue("signature", out var signature);
 
                 var verifyResult = VerifySignature(appId, Convert.ToInt64(timestamp), nonce, signature, request.Query,
-                    JsonConvert.DeserializeObject(requestBody.Clone().ToString()), nonceCache,
+                    JsonConvert.DeserializeObject(requestBody), nonceCache,
                     apiAuthorizeOptions.Value);
                 if (verifyResult != string.Empty)
                 {
@@ -58,7 +58,7 @@ namespace RuralAssets.WebApplication
                     {
                         Code = cryptoService.Encrypt(MessageHelper.GetCode(MessageHelper.Message.AuthorizeFailed)),
                         Msg = cryptoService.Encrypt(MessageHelper.GetMessage(MessageHelper.Message.AuthorizeFailed)),
-                        Description = verifyResult
+                        //Description = verifyResult
                     };
                     context.Response.ContentType = "application/json; charset=utf-8; v=1.0";
                     var options = new JsonSerializerOptions
@@ -123,9 +123,9 @@ namespace RuralAssets.WebApplication
         {
             var time = DateTimeOffset.FromUnixTimeMilliseconds(timestamp);
             var utcNow = DateTimeOffset.UtcNow;
-            if (time > utcNow || time < utcNow.AddMinutes(-30))
+            if (time > utcNow || time < utcNow.AddMinutes(-10))
             {
-                return "时间戳超时（30分钟）";
+                return "时间戳超时（10分钟）";
             }
 
             var nonceExist = true;
@@ -178,7 +178,7 @@ namespace RuralAssets.WebApplication
             if (obj is JObject)
             {
                 var sortedDictionary =
-                    JsonSerializer.Deserialize<SortedDictionary<string, dynamic>>(obj.ToString());
+                    JsonConvert.DeserializeObject<SortedDictionary<string, dynamic>>(obj.ToString());
 
                 sortedString = sortedDictionary.OrderBy(d => d.Key).Aggregate(sortedString,
                     (current, param) => (string) (current + (param.Key + "=" + GetSortedString(param.Value))));
