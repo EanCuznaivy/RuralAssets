@@ -4,6 +4,7 @@ using System.IO;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Primitives;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -19,16 +20,23 @@ namespace RuralAssets.WebApplication
             _next = next;
         }
 
-        public async Task Invoke(HttpContext context, ICryptoService cryptoService)
+        public async Task Invoke(HttpContext context, ICryptoService cryptoService, IOptionsSnapshot<ModuleConfigOptions> moduleOptions)
         {
             var requestPath = context.Request.Path.Value;
             if (!requestPath.StartsWith("/api", StringComparison.OrdinalIgnoreCase) ||
-                requestPath.EndsWith("upload", StringComparison.OrdinalIgnoreCase))
+                requestPath.EndsWith("upload", StringComparison.OrdinalIgnoreCase) ||
+                !moduleOptions.Value.EnableCrypto)
             {
                 await _next(context);
                 return;
             }
 
+            string requestContent;
+            using (var reader = new StreamReader(context.Request.Body))
+            {
+                requestContent = await reader.ReadToEndAsync();
+            }
+            
             var dic = new Dictionary<string, StringValues>();
             foreach (var query in context.Request.Query)
             {
@@ -36,12 +44,6 @@ namespace RuralAssets.WebApplication
             }
 
             context.Request.Query = new QueryCollection(dic);
-
-            string requestContent;
-            using (var reader = new StreamReader(context.Request.Body))
-            {
-                requestContent = await reader.ReadToEndAsync();
-            }
 
             var requestJson = JsonConvert.SerializeObject(HandleJson(cryptoService.Decrypt,
                 JsonConvert.DeserializeObject(requestContent)));

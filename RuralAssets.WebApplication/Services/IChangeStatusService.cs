@@ -3,7 +3,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using AElf.Client.Dto;
 using AElf.Contracts.Assets;
-using Google.Protobuf.WellKnownTypes;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using MySql.Data.MySqlClient;
@@ -95,7 +94,7 @@ namespace RuralAssets.WebApplication
                 }
             }
 
-            var result = await RecordTransactionToBlockchain(input);
+            var result = RecordTransactionToBlockchain(input);
             var success = await UpdateStatusInTransactionAsync(input, result.TransactionId);
             return new ResponseDto
             {
@@ -111,7 +110,7 @@ namespace RuralAssets.WebApplication
         {
             await using var conn = new MySqlConnection(_configOptions.RuralAssetsConnectString);
             conn.Open();
-            bool isSuccess = true;
+            var isSuccess = true;
             foreach (var assetInChain in input.AssetList)
             {
                 await using var transaction = conn.BeginTransaction();
@@ -137,7 +136,8 @@ namespace RuralAssets.WebApplication
                     foreach (var loanFile in assetInChain.LoanFiles)
                     {
                         var insertFileInfoSql = SqlStatementHelper.GetInsertFileInfoSql(input.Name, input.IdCard,
-                            input.AssetType, assetInChain.AssetId, loanFile.FileId, loanFile.FileType, loanFile.FileHash,
+                            input.AssetType, assetInChain.AssetId, loanFile.FileId, loanFile.FileType,
+                            loanFile.FileHash,
                             loanFile.TransactionId);
                         _logger.LogInformation(insertFileInfoSql);
                         cmd.CommandText = insertFileInfoSql;
@@ -157,7 +157,7 @@ namespace RuralAssets.WebApplication
             return isSuccess;
         }
 
-        private async Task<TransactionResultDto> RecordTransactionToBlockchain(ChangeStatusInput input)
+        private TransactionResultDto RecordTransactionToBlockchain(ChangeStatusInput input)
         {
             var nodeManager = new NodeManager(_configOptions.BlockChainEndpoint);
             var assetInfo = new AssetInfo
