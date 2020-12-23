@@ -35,9 +35,26 @@ namespace RuralAssets.WebApplication
             context.Request.EnableBuffering();
 
             string requestBody;
-            using (var stream = new StreamReader(context.Request.Body))
+
+            if (context.Request.Path.Value.EndsWith("upload"))
             {
-                requestBody = await stream.ReadToEndAsync();
+                var formData = context.Request.Form;
+                requestBody = JsonConvert.SerializeObject(new UploadInput
+                {
+                    file_type = formData[nameof(UploadInput.file_type)].ToString(),
+                    idcard = formData[nameof(UploadInput.idcard)].ToString(),
+                    loan_id = formData[nameof(UploadInput.loan_id)].ToString(),
+                    asset_id = formData[nameof(UploadInput.asset_id)].ToString(),
+                    asset_type = formData[nameof(UploadInput.asset_type)].ToString(),
+                    file_hash = formData[nameof(UploadInput.file_hash)].ToString(),
+                });
+            }
+            else
+            {
+                using (var stream = new StreamReader(context.Request.Body))
+                {
+                    requestBody = await stream.ReadToEndAsync();
+                }
             }
 
             if (context.Request.Path.Value.StartsWith("/api", StringComparison.OrdinalIgnoreCase) &&
@@ -50,8 +67,7 @@ namespace RuralAssets.WebApplication
                 request.Headers.TryGetValue("signature", out var signature);
 
                 var verifyResult = VerifySignature(appId, Convert.ToInt64(timestamp), nonce, signature, request.Query,
-                    JsonConvert.DeserializeObject(requestBody), nonceCache,
-                    apiAuthorizeOptions.Value);
+                    requestBody, nonceCache, apiAuthorizeOptions.Value);
                 if (verifyResult != string.Empty)
                 {
                     var result = new ResponseDto
@@ -72,7 +88,6 @@ namespace RuralAssets.WebApplication
 
             var requestPath = context.Request.Path.Value;
             if (!requestPath.StartsWith("/api", StringComparison.OrdinalIgnoreCase) ||
-                requestPath.EndsWith("upload", StringComparison.OrdinalIgnoreCase) ||
                 !moduleOptions.Value.EnableCrypto)
             {
                 await _next(context);
@@ -118,9 +133,15 @@ namespace RuralAssets.WebApplication
         }
 
         private string VerifySignature(string appId, long timestamp, string nonce, string signature,
-            IQueryCollection query, object body, IDistributedCache<NonceCache> nonceCache,
+            IQueryCollection query, string body, IDistributedCache<NonceCache> nonceCache,
             ApiAuthorizeOptions apiAuthorizeOptions)
         {
+            if (string.IsNullOrEmpty(string.Empty) || timestamp == 0 || string.IsNullOrEmpty(nonce) ||
+                string.IsNullOrEmpty(string.Empty))
+            {
+                return "签名信息不全";
+            }
+
             var time = DateTimeOffset.FromUnixTimeMilliseconds(timestamp);
             var utcNow = DateTimeOffset.UtcNow;
             if (time > utcNow || time < utcNow.AddMinutes(-10))
@@ -153,7 +174,7 @@ namespace RuralAssets.WebApplication
                 message += queryString;
             }
 
-            var sortedString = GetSortedString(body);
+            var sortedString = GetSortedString(JsonConvert.DeserializeObject(body));
             message += sortedString;
 
             var appsecret = apiAuthorizeOptions.AppAccount[appId];
@@ -174,6 +195,11 @@ namespace RuralAssets.WebApplication
 
         private string GetSortedString(object obj)
         {
+            if (obj == null)
+            {
+                return string.Empty;
+            }
+
             var sortedString = string.Empty;
             if (obj is JObject)
             {
@@ -181,7 +207,10 @@ namespace RuralAssets.WebApplication
                     JsonConvert.DeserializeObject<SortedDictionary<string, dynamic>>(obj.ToString());
 
                 sortedString = sortedDictionary.OrderBy(d => d.Key).Aggregate(sortedString,
-                    (current, param) => (string) (current + (param.Key + "=" + GetSortedString(param.Value))));
+                    (current, param) =>
+                        (string) (current + (param.Value == null
+                                      ? string.Empty
+                                      : (param.Key + "=" + GetSortedString(param.Value)))));
             }
             else if (obj is JArray jArray)
             {

@@ -1,3 +1,4 @@
+using System;
 using System.IO;
 using System.Text;
 using System.Threading.Tasks;
@@ -7,7 +8,6 @@ using AElf.Contracts.Assets;
 using Google.Protobuf.WellKnownTypes;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
-
 
 namespace RuralAssets.WebApplication
 {
@@ -30,16 +30,16 @@ namespace RuralAssets.WebApplication
         public string ValidateFile(UploadInput input)
         {
             var errorMsg = string.Empty;
-            var file = input.LoanFile;
+            var file = input.loan_file;
             if (file == null)
             {
                 errorMsg = "文件为空";
             }
-            else if (string.IsNullOrEmpty(input.FileType))
+            else if (string.IsNullOrEmpty(input.file_type))
             {
                 errorMsg = "文件类型";
             }
-            else if (string.IsNullOrEmpty(input.LoanFile.Name))
+            else if (string.IsNullOrEmpty(input.loan_file.Name))
             {
                 errorMsg = "文件名为空";
             }
@@ -50,9 +50,9 @@ namespace RuralAssets.WebApplication
         public async Task<FileSavedInfo> SaveFileInfoAsync(UploadInput input)
         {
             MakeSureSaveDirExist();
-            var file = input.LoanFile;
-            var fileId = GenerateFileId(input.IdCard, input.LoanId, input.FileType, input.AssetId,
-                input.AssetType);
+            var file = input.loan_file;
+            var fileId = GenerateFileId(input.idcard, input.loan_id, input.file_type, input.asset_id,
+                input.asset_type);
             var path = Path.Combine(_configOptions.FileSaveDir, fileId);
             var fileHash = await SaveAndCalculateMD5Async(path, file);
             return new FileSavedInfo
@@ -62,7 +62,8 @@ namespace RuralAssets.WebApplication
             };
         }
 
-        private static async Task<string> SaveAndCalculateMD5Async(string path, IFormFile file){
+        private static async Task<string> SaveAndCalculateMD5Async(string path, IFormFile file)
+        {
             await using var stream = file.OpenReadStream();
 
             var calculator = System.Security.Cryptography.MD5.Create();
@@ -73,10 +74,11 @@ namespace RuralAssets.WebApplication
             {
                 stringBuilder.Append(t.ToString("x2"));
             }
+
             var hashMD5 = stringBuilder.ToString();
             stream.Seek(0, SeekOrigin.Begin);
             await using var fs = new FileStream(path, FileMode.Create);
-            await stream.CopyToAsync(fs); 
+            await stream.CopyToAsync(fs);
             return hashMD5;
         }
 
@@ -102,11 +104,11 @@ namespace RuralAssets.WebApplication
         }
 
         private static string GenerateFileId(string idCard, string loanId, string fileType,
-            int assetId, int assetType)
+            string assetId, string assetType)
         {
             var fileInfo = new StringValue
             {
-                Value = idCard + loanId + fileType + assetId + assetType
+                Value = idCard + loanId + fileType + assetId + assetType + DateTime.UtcNow.Millisecond
             };
             return HashHelper.ComputeFrom(fileInfo).ToString().TrimStart('"').TrimEnd('"');
         }

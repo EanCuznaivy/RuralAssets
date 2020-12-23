@@ -370,6 +370,17 @@ namespace RuralAssets.WebApplication.Controllers
 
             var fileInfo = await _fileValidationService.SaveFileInfoAsync(input);
             var result = _fileValidationService.RecordTransactionToBlockChain(fileInfo);
+            if (input.file_hash != fileInfo.FileHash)
+            {
+                message = MessageHelper.Message.FailToUploadFile;
+                return new UploadResponseDto
+                {
+                    Code = MessageHelper.GetCode(message),
+                    Msg = MessageHelper.GetMessage(message),
+                    Description = $"文件Hash不匹配，实际上是{fileInfo.FileHash}"
+                };
+            }
+
             return new UploadResponseDto
             {
                 Code = MessageHelper.GetCode(message),

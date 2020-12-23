@@ -6,17 +6,17 @@ namespace RuralAssets.WebApplication
 {
     public class UploadInput
     {
-        [JsonPropertyName("file_type")] public string FileType { get; set; }
-        [JsonPropertyName("idcard")] public string IdCard { get; set; }
-        [JsonPropertyName("loan_id")] public string LoanId { get; set; }
-        
-        [JsonPropertyName("asset_id")] public int AssetId { get; set; }
-        
-        [JsonPropertyName("asset_type")] public int AssetType { get; set; }
+        [JsonPropertyName("file_type")] public string file_type { get; set; }
+        [JsonPropertyName("idcard")] public string idcard { get; set; }
+        [JsonPropertyName("loan_id")] public string loan_id { get; set; }
 
-        [JsonPropertyName("loan_file")]
-        
-        public IFormFile LoanFile { get; set; }
+        [JsonPropertyName("asset_id")] public string asset_id { get; set; }
+
+        [JsonPropertyName("asset_type")] public string asset_type { get; set; }
+
+        [JsonPropertyName("file_hash")] public string file_hash { get; set; }
+
+        [JsonPropertyName("loan_file")] public IFormFile loan_file { get; set; }
     }
 
     public class FileSavedInfo
