@@ -74,7 +74,7 @@ namespace RuralAssets.WebApplication
                     {
                         Code = cryptoService.Encrypt(MessageHelper.GetCode(MessageHelper.Message.AuthorizeFailed)),
                         Msg = cryptoService.Encrypt(MessageHelper.GetMessage(MessageHelper.Message.AuthorizeFailed)),
-                        Description = verifyResult
+                        Description = cryptoService.Encrypt(verifyResult)
                     };
                     context.Response.ContentType = "application/json; charset=utf-8; v=1.0";
                     var options = new JsonSerializerOptions
@@ -144,9 +144,16 @@ namespace RuralAssets.WebApplication
 
             var time = DateTimeOffset.FromUnixTimeMilliseconds(timestamp);
             var utcNow = DateTimeOffset.UtcNow;
-            if (time > utcNow || time < utcNow.AddMinutes(-apiAuthorizeOptions.AllowMinutes))
+            if (time > utcNow.AddMilliseconds(apiAuthorizeOptions.TolerantMilliseconds))
             {
-                return $"时间戳超时（{apiAuthorizeOptions.AllowMinutes}分钟）";
+                return
+                    $"时间戳大于服务器时间{apiAuthorizeOptions.TolerantMilliseconds}毫秒，服务器UTC时间：{utcNow:yyyy-MM-dd HH:mm:ss}，毫秒数：{utcNow.ToUnixTimeMilliseconds()}";
+            }
+
+            if (time < utcNow.AddMinutes(-apiAuthorizeOptions.AllowMinutes))
+            {
+                //return
+                    //$"时间戳超时（{apiAuthorizeOptions.AllowMinutes}分钟），服务器UTC时间：{utcNow:yyyy-MM-dd HH:mm:ss}，毫秒数：{utcNow.ToUnixTimeMilliseconds()}";
             }
 
             var nonceExist = true;
@@ -259,7 +266,7 @@ namespace RuralAssets.WebApplication
                 return jArrayResult;
             }
 
-            throw new InvalidOperationException();
+            return obj.ToString();
         }
     }
 

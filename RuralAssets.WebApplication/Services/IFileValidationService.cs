@@ -37,7 +37,7 @@ namespace RuralAssets.WebApplication
             }
             else if (string.IsNullOrEmpty(input.file_type))
             {
-                errorMsg = "文件类型";
+                errorMsg = "文件类型为空";
             }
             else if (string.IsNullOrEmpty(input.loan_file.Name))
             {
@@ -77,7 +77,7 @@ namespace RuralAssets.WebApplication
 
             var hashMD5 = stringBuilder.ToString();
             stream.Seek(0, SeekOrigin.Begin);
-            await using var fs = new FileStream(path, FileMode.Create);
+            await using var fs = new FileStream(path, FileMode.OpenOrCreate);
             await stream.CopyToAsync(fs);
             return hashMD5;
         }
@@ -108,9 +108,11 @@ namespace RuralAssets.WebApplication
         {
             var fileInfo = new StringValue
             {
-                Value = idCard + loanId + fileType + assetId + assetType + DateTime.UtcNow.Millisecond
+                Value = idCard + loanId + fileType + assetId + assetType
             };
-            return HashHelper.ComputeFrom(fileInfo).ToString().TrimStart('"').TrimEnd('"');
+            return $"{HashHelper.ComputeFrom(fileInfo)}{DateTimeOffset.UtcNow.ToUnixTimeMilliseconds()}"
+                .Replace("\"", string.Empty)
+                .Replace("\\", string.Empty);
         }
     }
 }

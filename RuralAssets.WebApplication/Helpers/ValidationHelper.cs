@@ -20,6 +20,11 @@ namespace RuralAssets.WebApplication
 
         public bool ValidateIdCard(string idCard)
         {
+            if (string.IsNullOrEmpty(idCard))
+            {
+                return false;
+            }
+
             if (_moduleOptions.EnableIdCardCheck)
             {
                 return new Regex(

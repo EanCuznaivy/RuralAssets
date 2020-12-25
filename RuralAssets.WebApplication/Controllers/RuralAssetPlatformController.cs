@@ -368,29 +368,42 @@ namespace RuralAssets.WebApplication.Controllers
                 };
             }
 
-            var fileInfo = await _fileValidationService.SaveFileInfoAsync(input);
-            var result = _fileValidationService.RecordTransactionToBlockChain(fileInfo);
-            if (input.file_hash != fileInfo.FileHash)
+            try
+            {
+                var fileInfo = await _fileValidationService.SaveFileInfoAsync(input);
+                var result = _fileValidationService.RecordTransactionToBlockChain(fileInfo);
+                if (input.file_hash != fileInfo.FileHash)
+                {
+                    message = MessageHelper.Message.FailToUploadFile;
+                    return new UploadResponseDto
+                    {
+                        Code = MessageHelper.GetCode(message),
+                        Msg = MessageHelper.GetMessage(message),
+                        Description = $"文件Hash不匹配，实际上是{fileInfo.FileHash}"
+                    };
+                }
+
+                return new UploadResponseDto
+                {
+                    Code = MessageHelper.GetCode(message),
+                    Msg = MessageHelper.GetMessage(message),
+                    Description =
+                        $"交易Id：{result.TransactionId} 交易状态：{result.Status} 交易打包区块高度：{result.BlockNumber}",
+                    FileId = fileInfo.FileId,
+                    FileHash = fileInfo.FileHash,
+                    TransactionId = result.TransactionId
+                };
+            }
+            catch (Exception e)
             {
                 message = MessageHelper.Message.FailToUploadFile;
                 return new UploadResponseDto
                 {
                     Code = MessageHelper.GetCode(message),
                     Msg = MessageHelper.GetMessage(message),
-                    Description = $"文件Hash不匹配，实际上是{fileInfo.FileHash}"
+                    Description = $"文件上传失败：{e.Message}"
                 };
             }
-
-            return new UploadResponseDto
-            {
-                Code = MessageHelper.GetCode(message),
-                Msg = MessageHelper.GetMessage(message),
-                Description =
-                    $"交易Id：{result.TransactionId} 交易状态：{result.Status} 交易打包区块高度：{result.BlockNumber}",
-                FileId = fileInfo.FileId,
-                FileHash = fileInfo.FileHash,
-                TransactionId = result.TransactionId
-            };
         }
 
         [HttpPost("record_json")]
