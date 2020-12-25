@@ -74,7 +74,7 @@ namespace RuralAssets.WebApplication
                     {
                         Code = cryptoService.Encrypt(MessageHelper.GetCode(MessageHelper.Message.AuthorizeFailed)),
                         Msg = cryptoService.Encrypt(MessageHelper.GetMessage(MessageHelper.Message.AuthorizeFailed)),
-                        //Description = verifyResult
+                        Description = verifyResult
                     };
                     context.Response.ContentType = "application/json; charset=utf-8; v=1.0";
                     var options = new JsonSerializerOptions
@@ -136,17 +136,17 @@ namespace RuralAssets.WebApplication
             IQueryCollection query, string body, IDistributedCache<NonceCache> nonceCache,
             ApiAuthorizeOptions apiAuthorizeOptions)
         {
-            if (string.IsNullOrEmpty(string.Empty) || timestamp == 0 || string.IsNullOrEmpty(nonce) ||
-                string.IsNullOrEmpty(string.Empty))
+            if (string.IsNullOrEmpty(appId) || timestamp == 0 || string.IsNullOrEmpty(nonce) ||
+                string.IsNullOrEmpty(signature))
             {
                 return "签名信息不全";
             }
 
             var time = DateTimeOffset.FromUnixTimeMilliseconds(timestamp);
             var utcNow = DateTimeOffset.UtcNow;
-            if (time > utcNow || time < utcNow.AddMinutes(-10))
+            if (time > utcNow || time < utcNow.AddMinutes(-apiAuthorizeOptions.AllowMinutes))
             {
-                return "时间戳超时（10分钟）";
+                return $"时间戳超时（{apiAuthorizeOptions.AllowMinutes}分钟）";
             }
 
             var nonceExist = true;
@@ -157,7 +157,7 @@ namespace RuralAssets.WebApplication
             }, () =>
                 new DistributedCacheEntryOptions
                 {
-                    AbsoluteExpiration = time.AddMinutes(10)
+                    AbsoluteExpiration = time.AddMinutes(apiAuthorizeOptions.AllowMinutes)
                 });
 
             if (nonceExist)
