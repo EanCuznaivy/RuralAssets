@@ -79,7 +79,33 @@ namespace RuralAssets.WebApplication.Controllers
                 await MySqlHelper.ExecuteReaderAsync(_configOptions.RuralAssetsConnectString, sql);
             dataReader.Read();
             var result = dataReader[0].ToString();
-            string description;
+            GetCheckDescription(result, out var description);
+            if (result != "1")
+                return new ResponseDto
+                {
+                    Code = MessageHelper.GetCode(message),
+                    Msg = MessageHelper.GetMessage(message),
+                    Result = result,
+                    Description = description
+                };
+            sql = SqlStatementHelper.GetConstructionCheckSql(input.Name, input.IdCard, input.Year);
+            dataReader =
+                await MySqlHelper.ExecuteReaderAsync(_configOptions.RuralAssetsConnectString, sql);
+            dataReader.Read();
+            result = dataReader[0].ToString();
+            GetCheckDescription(result, out description);
+
+            return new ResponseDto
+            {
+                Code = MessageHelper.GetCode(message),
+                Msg = MessageHelper.GetMessage(message),
+                Result = result,
+                Description = description
+            };
+        }
+
+        private void GetCheckDescription(string result, out string description)
+        {
             switch (result)
             {
                 case "1":
@@ -98,14 +124,6 @@ namespace RuralAssets.WebApplication.Controllers
                     description = "系统异常";
                     break;
             }
-
-            return new ResponseDto
-            {
-                Code = MessageHelper.GetCode(message),
-                Msg = MessageHelper.GetMessage(message),
-                Result = result,
-                Description = description
-            };
         }
 
         [HttpPost("query_credit")]
@@ -144,7 +162,19 @@ namespace RuralAssets.WebApplication.Controllers
                     BCZJE = CommonHelper.ParseToDouble(dataReader, 34)
                 });
             }
-
+            
+            sql = SqlStatementHelper.GetQueryConstructionCreditSql(input.Name, input.IdCard);
+            dataReader =
+                await MySqlHelper.ExecuteReaderAsync(_configOptions.RuralAssetsConnectString, sql);
+            while (dataReader.Read())
+            {
+                assetRequestList.Add(new AssetRequest
+                {
+                    AssetId = CommonHelper.ParseToInt(dataReader, 0),
+                    BCZJE = CommonHelper.ParseToDouble(dataReader, 3)
+                });
+            }
+            
             var client = new HttpClient();
             var request = new QueryCreditRequest
             {
@@ -229,8 +259,11 @@ namespace RuralAssets.WebApplication.Controllers
                 List = new List<AssetDto>()
             };
             int.TryParse(input.BFZT, out var bfzt);
-            var sql = SqlStatementHelper.GetListSql(input.Name, input.IdCard, Convert.ToInt32(input.AssetId),
-                bfzt, input.LSX, input.LSXZ, input.LSC, pageNo, pageSize == 0 ? 100 : pageSize);
+            var sql = input.AssetType == "1"
+                ? SqlStatementHelper.GetListSql(input.Name, input.IdCard, Convert.ToInt32(input.AssetId),
+                    bfzt, input.LSX, input.LSXZ, input.LSC, pageNo, pageSize == 0 ? 100 : pageSize)
+                : SqlStatementHelper.GetListOfConstructionSql(input.Name, input.IdCard, Convert.ToInt32(input.AssetId),
+                    pageNo, pageSize == 0 ? 100 : pageSize);
             var dataReader =
                 await MySqlHelper.ExecuteReaderAsync(_configOptions.RuralAssetsConnectString, sql);
             while (dataReader.Read())
@@ -291,7 +324,9 @@ namespace RuralAssets.WebApplication.Controllers
                 };
             }
 
-            var sql = SqlStatementHelper.GetDetailSql(input.Name, input.Idcard, assetId);
+            var sql = input.AssetType == "1"
+                ? SqlStatementHelper.GetDetailSql(input.Name, input.Idcard, assetId)
+                : SqlStatementHelper.GetDetailOfConstructionSql(input.Name, input.Idcard, assetId);
             var dataReader =
                 await MySqlHelper.ExecuteReaderAsync(_configOptions.RuralAssetsConnectString, sql);
             dataReader.Read();

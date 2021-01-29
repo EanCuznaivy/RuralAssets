@@ -118,9 +118,13 @@ namespace RuralAssets.WebApplication
                 {
                     var cmd = conn.CreateCommand();
                     cmd.Transaction = transaction;
-                    var changeStatusSql = SqlStatementHelper.GetChangeStatusSql(input.Name, input.IdCard,
-                        assetInChain.AssetId,
-                        assetInChain.Status);
+                    var changeStatusSql = input.AssetType == "1"?
+                        SqlStatementHelper.GetChangeStatusSql(input.Name, input.IdCard,
+                            assetInChain.AssetId,
+                            assetInChain.Status):
+                        SqlStatementHelper.GetChangeStatusForConstructionSql(input.Name, input.IdCard,
+                            assetInChain.AssetId,
+                            assetInChain.Status);
                     _logger.LogInformation(changeStatusSql);
                     cmd.CommandText = changeStatusSql;
                     await cmd.ExecuteNonQueryAsync();

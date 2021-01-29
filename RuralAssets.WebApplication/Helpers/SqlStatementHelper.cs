@@ -25,6 +25,29 @@ WHERE
                    );
         }
 
+        public static string GetConstructionCheckSql(string name, string idCard, string year)
+        {
+            return $@"
+SELECT 
+CASE WHEN count(1) > 0 AND max(a.zczt)< 3 THEN 4 /**资产不符合要求**/ 
+    WHEN count(1) > 0 AND sum(CASE WHEN a.bfzt = 4 THEN 1 ELSE 0 END) = 0 THEN 3 /**资产不存在**/		
+		WHEN count(1)= 0 THEN 2 /**用户不存在**/		
+		WHEN count(1) > 0 THEN 1 /**核验通过**/		
+	END result 
+FROM
+	cet_zj_lwrygz_lwry a
+	LEFT JOIN cet_zj_lwrygz b ON a.cet_zj_lwrygz_id = b.id 
+WHERE
+  a.xm = '{name}' 
+ AND a.sfzhm = '{idCard}' 
+" +
+                   (string.IsNullOrEmpty(year)
+                       ? ""
+                       : $"AND CAST( LEFT ( b.casj, 4 ) AS SIGNED ) = {year}"
+                   );
+            
+        }
+
         public static string GetQueryCreditSql(string name, string idCard)
         {
             return $@"
@@ -36,7 +59,22 @@ select a.skr as name,a.sfzh as idcard, 1 as asset_type,a.id as asset_id,concat_w
 	where a.skr = '{name}' and a.sfzh = '{idCard}' 
 ";
         }
-
+        
+        public static string GetQueryConstructionCreditSql(string name, string idCard)
+        {
+            return $@"
+SELECT 
+  a.id as asset_id,a.xm as name,a.sfzhm as idcard,a.sfje as bczje
+FROM
+	cet_zj_lwrygz_lwry a
+	LEFT JOIN cet_zj_lwrygz b ON a.cet_zj_lwrygz_id = b.id 
+WHERE
+     a.bfzt = 4
+	and a.xm = '{name}'                       #姓名
+	AND a.sfzhm = '{idCard}'       #身份证号
+";
+        }
+        
         public static string GetChangeStatusSql(string name, string idCard, string assetId, string status)
         {
             return $@"
@@ -46,6 +84,18 @@ WHERE
 	t.id = {assetId}        #资产ID	
 	AND t.skr = '{name}'  #姓名	
 	AND t.sfzh = '{idCard}' #身份证号
+";
+        }
+        
+        public static string GetChangeStatusForConstructionSql(string name, string idCard, string assetId, string status)
+        {
+            return $@"
+UPDATE cet_zj_lwrygz_lwry t 
+SET t.zczt = {status}     #更新资产状态,数字
+WHERE
+	t.id = {assetId}            #资产ID，数字
+	AND t.xm = '{name}'     #姓名，字符串
+	AND t.sfzhm = '{idCard}'  #身份证号，字符串
 ";
         }
 
@@ -131,6 +181,40 @@ select
                    +
                    $" order by a.id asc limit {pageNo},{pageSize}";
         }
+        
+        public static string GetListOfConstructionSql(string name, string idCard, int assetId, int pageNo, int pageSize)
+        {
+            return $@"
+SELECT
+t.id AS asset_id,	'' AS pc,	'' AS pch,	b.xmxx AS xmmcid,	c.xmmc AS xmmcms,
+if(char_length(t.xm)=2,REPLACE(t.xm,SUBSTR(t.xm,1,1), '*'),REPLACE(t.xm,SUBSTR(t.xm,2,1), '*'))  AS name,	
+            INSERT(t.sfzhm,7,10,'**********')  AS sfzh,	
+            if(length(t.lxdh)>0,CONCAT(LEFT(t.lxdh,3), '****' ,RIGHT(t.lxdh,4)),null)  AS lxfs,	t.khhmc AS khyh,	'' AS zhxzid,
+            '' AS zhxzms,	'' AS zchmj,	t.sfje AS bczje,
+                CASE t.bfzt WHEN 1 THEN '待复核' WHEN 2 THEN '拨付中' WHEN 3 THEN '拨付失败' WHEN 4 THEN '已拨付' WHEN 5 THEN '录入失败' WHEN 6 THEN '工资代发' END AS bfztms,
+            '' AS lsx,'' AS lsxz,t.ssxzjc AS lsc 
+                FROM
+            cet_zj_lwrygz_lwry t
+            LEFT JOIN cet_zj_lwrygz b ON t.CET_ZJ_LWRYGZ_ID = b.id
+            LEFT JOIN cet_xm_xmjbxx c ON b.xmxx = c.id 
+            WHERE 1=1
+" +
+                   (string.IsNullOrEmpty(name)
+                       ? ""
+                       : $" and t.xm = '{name}'")
+                   +
+                   (string.IsNullOrEmpty(idCard)
+                       ? ""
+                       : $" and t.sfzhm = '{idCard}'")
+                   +
+                   (assetId == 0
+                       ? ""
+                       : $" and t.id = {assetId}")
+                   +
+                   "and t.bfzt<> 2 and replace(t.bfzt, 4,2) = 2"
+                   +
+                   $"order by t.id asc limit {pageNo},{pageSize}";
+        }
 
         public static string GetDetailSql(string name, string idCard, int assetId)
         {
@@ -143,6 +227,28 @@ select
             left join entity_xmxxgl d on a.xmmc = d.id      /**关联项目信息**/
             left join entity_bcmxsc e on a.tdbcmxpc = e.id  /**关联补偿批次信息**/
             where a.skr = '{name}' and a.sfzh = '{idCard}' and a.id = {assetId}
+";
+        }
+        
+        public static string GetDetailOfConstructionSql(string name, string idCard, int assetId)
+        {
+            return $@"
+SELECT 
+	t.id AS asset_id,	concat_ws('-',t.qkgd,t.id) AS blockId,	t.id,	if(char_length(t.xm)=2,REPLACE(t.xm,SUBSTR(t.xm,1,1), '*'),REPLACE(t.xm,SUBSTR(t.xm,2,1), '*'))  AS skr,INSERT(t.sfzhm,7,10,'**********') AS sfzh,if(length(t.lxdh)>0,CONCAT(LEFT(t.lxdh,3), '****' ,RIGHT(t.lxdh,4)),null) AS lxfs,
+            if(instr(t.khhmc,'银行')=0,'',substr(t.khhmc,1,instr(t.khhmc,'银行')+1)) as yhlx,t.khhmc AS khszyh,
+                t.khhmc AS khyh,t.yhlhh as lhh,t.yhkh as yhzh,case t.sfkh when 1 then '同行' when 2 then '跨行' end as sfkh,'' as zhxz,'' as ntfw,'' as dz,'' as xz,'' as nz,'' as bf,'' as zchmj,'' as dtzw,'' as sc,'' as jjzw,'' as sm,
+'' as smz,'' as dpzw,'' as qt,'' as tdsyj,'' as dtzwje,'' as scje,'' as qtzwje,'' as dpzwje,'' as qtfzwje,
+t.sfje AS bczje,'' as zjedx,'' as fj,t.bdbzxx as bz,b.casj as cjsj,b.czr as cjr,
+CASE t.bfzt WHEN 1 THEN '待复核' WHEN 2 THEN '拨付中' WHEN 3 THEN '拨付失败' WHEN 4 THEN '已拨付' WHEN 5 THEN '录入失败' WHEN 6 THEN '工资代发' END AS bfzt,
+'' as sfsc,'' as htfj,'' as tdbcmxpc,t.seqno as dealno,c.xmmc,'' as szzw,'' as lsx,'' as lsxz,t.ssxzjc as lsc,'' as sfxx
+FROM
+	cet_zj_lwrygz_lwry t
+	LEFT JOIN cet_zj_lwrygz b ON t.CET_ZJ_LWRYGZ_ID = b.id
+	LEFT JOIN cet_xm_xmjbxx c ON b.xmxx = c.id 
+WHERE 1=1 
+	AND t.xm = '{name}'                       #姓名	
+	AND t.sfzhm = '{idCard}'         #身份证号	
+	AND t.id = {assetId}                            #资产ID
 ";
         }
     }
