@@ -74,26 +74,14 @@ namespace RuralAssets.WebApplication.Controllers
             }
 
             message = MessageHelper.Message.Success;
-            var sql = SqlStatementHelper.GetCheckSql(input.Name, input.IdCard, input.Year);
+            var sql = input.AssetType == "1"
+                ? SqlStatementHelper.GetCheckSql(input.Name, input.IdCard, input.Year)
+                : SqlStatementHelper.GetConstructionCheckSql(input.Name, input.IdCard, input.Year);
             var dataReader =
                 await MySqlHelper.ExecuteReaderAsync(_configOptions.RuralAssetsConnectString, sql);
             dataReader.Read();
             var result = dataReader[0].ToString();
             GetCheckDescription(result, out var description);
-            if (result != "1")
-                return new ResponseDto
-                {
-                    Code = MessageHelper.GetCode(message),
-                    Msg = MessageHelper.GetMessage(message),
-                    Result = result,
-                    Description = description
-                };
-            sql = SqlStatementHelper.GetConstructionCheckSql(input.Name, input.IdCard, input.Year);
-            dataReader =
-                await MySqlHelper.ExecuteReaderAsync(_configOptions.RuralAssetsConnectString, sql);
-            dataReader.Read();
-            result = dataReader[0].ToString();
-            GetCheckDescription(result, out description);
 
             return new ResponseDto
             {
