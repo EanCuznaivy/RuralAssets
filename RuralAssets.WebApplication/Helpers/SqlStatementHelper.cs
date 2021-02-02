@@ -213,7 +213,7 @@ if(char_length(t.xm)=2,REPLACE(t.xm,SUBSTR(t.xm,1,1), '*'),REPLACE(t.xm,SUBSTR(t
                    +
                    "and t.bfzt<> 2 and replace(t.bfzt, 4,2) = 2"
                    +
-                   $"order by t.id asc limit {pageNo},{pageSize}";
+                   $" order by t.id asc limit {pageNo},{pageSize}";
         }
 
         public static string GetDetailSql(string name, string idCard, int assetId)

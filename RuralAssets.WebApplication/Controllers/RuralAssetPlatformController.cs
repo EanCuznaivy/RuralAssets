@@ -249,9 +249,9 @@ namespace RuralAssets.WebApplication.Controllers
             int.TryParse(input.BFZT, out var bfzt);
             var sql = input.AssetType == "1"
                 ? SqlStatementHelper.GetListSql(input.Name, input.IdCard, Convert.ToInt32(input.AssetId),
-                    bfzt, input.LSX, input.LSXZ, input.LSC, pageNo, pageSize == 0 ? 100 : pageSize)
+                    bfzt, input.LSX, input.LSXZ, input.LSC, pageNo, pageSize)
                 : SqlStatementHelper.GetListOfConstructionSql(input.Name, input.IdCard, Convert.ToInt32(input.AssetId),
-                    pageNo, pageSize == 0 ? 100 : pageSize);
+                    pageNo, pageSize);
             var dataReader =
                 await MySqlHelper.ExecuteReaderAsync(_configOptions.RuralAssetsConnectString, sql);
             while (dataReader.Read())
