@@ -318,7 +318,7 @@ namespace RuralAssets.WebApplication.Controllers
             var dataReader =
                 await MySqlHelper.ExecuteReaderAsync(_configOptions.RuralAssetsConnectString, sql);
             dataReader.Read();
-            return new DetailsResponseDto
+            var detailInfo = new DetailsResponseDto
             {
                 Code = MessageHelper.GetCode(message),
                 Msg = MessageHelper.GetMessage(message),
@@ -365,14 +365,27 @@ namespace RuralAssets.WebApplication.Controllers
                 HTFJ = dataReader[40]?.ToString() ?? string.Empty,
                 TDBCMXPC = CommonHelper.ParseToDouble(dataReader, 41),
                 Dealno = dataReader[42]?.ToString() ?? string.Empty,
-                XMMC = dataReader[43]?.ToString() ?? string.Empty,
-                XMLX = dataReader[44]?.ToString() ?? string.Empty,
-                SZZW = dataReader[45]?.ToString() ?? string.Empty,
-                LSX = dataReader[46]?.ToString() ?? string.Empty,
-                LSXZ = dataReader[47]?.ToString() ?? string.Empty,
-                LSC = dataReader[48]?.ToString() ?? string.Empty,
-                SFXX = dataReader[49]?.ToString() ?? string.Empty,
+                XMMC = dataReader[43]?.ToString() ?? string.Empty
             };
+            if (input.AssetType == "1")
+            {
+                detailInfo.XMLX = dataReader[44]?.ToString() ?? string.Empty;
+                detailInfo.SZZW = dataReader[45]?.ToString() ?? string.Empty;
+                detailInfo.LSX = dataReader[46]?.ToString() ?? string.Empty;
+                detailInfo.LSXZ = dataReader[47]?.ToString() ?? string.Empty;
+                detailInfo.LSC = dataReader[48]?.ToString() ?? string.Empty;
+                detailInfo.SFXX = dataReader[49]?.ToString() ?? string.Empty;
+            }
+            else
+            {
+                detailInfo.XMLX = string.Empty;
+                detailInfo.SZZW = dataReader[44]?.ToString() ?? string.Empty;
+                detailInfo.LSX = dataReader[45]?.ToString() ?? string.Empty;
+                detailInfo.LSXZ = dataReader[46]?.ToString() ?? string.Empty;
+                detailInfo.LSC = dataReader[47]?.ToString() ?? string.Empty;
+                detailInfo.SFXX = dataReader[48]?.ToString() ?? string.Empty;
+            }
+            return detailInfo;
         }
 
         [HttpPost("upload")]
