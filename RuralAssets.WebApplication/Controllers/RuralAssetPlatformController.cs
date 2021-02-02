@@ -254,28 +254,57 @@ namespace RuralAssets.WebApplication.Controllers
                     pageNo, pageSize);
             var dataReader =
                 await MySqlHelper.ExecuteReaderAsync(_configOptions.RuralAssetsConnectString, sql);
-            while (dataReader.Read())
+            if (input.AssetType == "1")
             {
-                response.List.Add(new AssetDto
+                while (dataReader.Read())
                 {
-                    AssetId = CommonHelper.ParseToInt(dataReader, 0),
-                    PC = dataReader[1]?.ToString() ?? string.Empty,
-                    PCH = dataReader[2]?.ToString() ?? string.Empty,
-                    XMMCId = CommonHelper.ParseToInt(dataReader, 3),
-                    XMMCMS = dataReader[4]?.ToString() ?? string.Empty,
-                    Name = dataReader[5]?.ToString() ?? string.Empty,
-                    SFZH = dataReader[6]?.ToString() ?? string.Empty,
-                    LXFS = dataReader[7]?.ToString() ?? string.Empty,
-                    KHYH = dataReader[8]?.ToString() ?? string.Empty,
-                    ZHXZId = CommonHelper.ParseToInt(dataReader, 9),
-                    ZHXZMS = dataReader[10]?.ToString() ?? string.Empty,
-                    ZCHMJ = dataReader[11]?.ToString() ?? string.Empty,
-                    BCZJE = dataReader[12]?.ToString() ?? string.Empty,
-                    BFZTMS = dataReader[14]?.ToString() ?? string.Empty,
-                    LSX = dataReader[16]?.ToString() ?? string.Empty,
-                    LSXZ = dataReader[18]?.ToString() ?? string.Empty,
-                    LSC = dataReader[20]?.ToString() ?? string.Empty
-                });
+                    response.List.Add(new AssetDto
+                    {
+                        AssetId = CommonHelper.ParseToInt(dataReader, 0),
+                        PC = dataReader[1]?.ToString() ?? string.Empty,
+                        PCH = dataReader[2]?.ToString() ?? string.Empty,
+                        XMMCId = CommonHelper.ParseToInt(dataReader, 3),
+                        XMMCMS = dataReader[4]?.ToString() ?? string.Empty,
+                        Name = dataReader[5]?.ToString() ?? string.Empty,
+                        SFZH = dataReader[6]?.ToString() ?? string.Empty,
+                        LXFS = dataReader[7]?.ToString() ?? string.Empty,
+                        KHYH = dataReader[8]?.ToString() ?? string.Empty,
+                        ZHXZId = CommonHelper.ParseToInt(dataReader, 9),
+                        ZHXZMS = dataReader[10]?.ToString() ?? string.Empty,
+                        ZCHMJ = dataReader[11]?.ToString() ?? string.Empty,
+                        BCZJE = dataReader[12]?.ToString() ?? string.Empty,
+                        BFZTMS = dataReader[14]?.ToString() ?? string.Empty,
+                        LSX = dataReader[16]?.ToString() ?? string.Empty,
+                        LSXZ = dataReader[18]?.ToString() ?? string.Empty,
+                        LSC = dataReader[20]?.ToString() ?? string.Empty
+                    });
+                }
+            }
+            else
+            {
+                while (dataReader.Read())
+                {
+                    response.List.Add(new AssetDto
+                    {
+                        AssetId = CommonHelper.ParseToInt(dataReader, 0),
+                        PC = dataReader[1]?.ToString() ?? string.Empty,
+                        PCH = dataReader[2]?.ToString() ?? string.Empty,
+                        XMMCId = CommonHelper.ParseToInt(dataReader, 3),
+                        XMMCMS = dataReader[4]?.ToString() ?? string.Empty,
+                        Name = dataReader[5]?.ToString() ?? string.Empty,
+                        SFZH = dataReader[6]?.ToString() ?? string.Empty,
+                        LXFS = dataReader[7]?.ToString() ?? string.Empty,
+                        KHYH = dataReader[8]?.ToString() ?? string.Empty,
+                        ZHXZId = CommonHelper.ParseToInt(dataReader, 9),
+                        ZHXZMS = dataReader[10]?.ToString() ?? string.Empty,
+                        ZCHMJ = dataReader[11]?.ToString() ?? string.Empty,
+                        BCZJE = dataReader[12]?.ToString() ?? string.Empty,
+                        BFZTMS = dataReader[13]?.ToString() ?? string.Empty,
+                        LSX = dataReader[14]?.ToString() ?? string.Empty,
+                        LSXZ = dataReader[15]?.ToString() ?? string.Empty,
+                        LSC = dataReader[16]?.ToString() ?? string.Empty
+                    });
+                }
             }
 
             if (!response.List.Any())

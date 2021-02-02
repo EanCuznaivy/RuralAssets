@@ -232,23 +232,25 @@ select
         
         public static string GetDetailOfConstructionSql(string name, string idCard, int assetId)
         {
-            return $@"
+           return $@"
+
 SELECT 
 	t.id AS asset_id,	concat_ws('-',t.qkgd,t.id) AS blockId,	t.id,	if(char_length(t.xm)=2,REPLACE(t.xm,SUBSTR(t.xm,1,1), '*'),REPLACE(t.xm,SUBSTR(t.xm,2,1), '*'))  AS skr,INSERT(t.sfzhm,7,10,'**********') AS sfzh,if(length(t.lxdh)>0,CONCAT(LEFT(t.lxdh,3), '****' ,RIGHT(t.lxdh,4)),null) AS lxfs,
             if(instr(t.khhmc,'银行')=0,'',substr(t.khhmc,1,instr(t.khhmc,'银行')+1)) as yhlx,t.khhmc AS khszyh,
-                t.khhmc AS khyh,t.yhlhh as lhh,t.yhkh as yhzh,case t.sfkh when 1 then '同行' when 2 then '跨行' end as sfkh,'' as zhxz,'' as ntfw,'' as dz,'' as xz,'' as nz,'' as bf,'' as zchmj,'' as dtzw,'' as sc,'' as jjzw,'' as sm,
-'' as smz,'' as dpzw,'' as qt,'' as tdsyj,'' as dtzwje,'' as scje,'' as qtzwje,'' as dpzwje,'' as qtfzwje,
-t.sfje AS bczje,'' as zjedx,'' as fj,t.bdbzxx as bz,b.casj as cjsj,b.czr as cjr,
-CASE t.bfzt WHEN 1 THEN '待复核' WHEN 2 THEN '拨付中' WHEN 3 THEN '拨付失败' WHEN 4 THEN '已拨付' WHEN 5 THEN '录入失败' WHEN 6 THEN '工资代发' END AS bfzt,
-'' as sfsc,'' as htfj,'' as tdbcmxpc,t.seqno as dealno,c.xmmc,'' as szzw,'' as lsx,'' as lsxz,t.ssxzjc as lsc,'' as sfxx
-FROM
-	cet_zj_lwrygz_lwry t
-	LEFT JOIN cet_zj_lwrygz b ON t.CET_ZJ_LWRYGZ_ID = b.id
-	LEFT JOIN cet_xm_xmjbxx c ON b.xmxx = c.id 
-WHERE 1=1 
-	AND t.xm = '{name}'                       #姓名	
-	AND t.sfzhm = '{idCard}'         #身份证号	
-	AND t.id = {assetId}                            #资产ID
+                t.khhmc AS khyh,t.yhlhh as lhh,CONCAT(LEFT(t.yhkh,4), '****' ,RIGHT(t.yhkh,4)) as yhzh,case t.sfkh when 1 then '同行' when 2 then '跨行' end as sfkh,'' as zhxz,'' as ntfw,'' as dz,'' as xz,'' as nz,'' as bf,'' as zchmj,'' as dtzw,'' as sc,'' as jjzw,'' as sm,
+            '' as smz,'' as dpzw,'' as qt,'' as tdsyj,'' as dtzwje,'' as scje,'' as qtzwje,'' as dpzwje,'' as qtfzwje,
+            t.sfje AS bczje,'' as zjedx,'' as fj,t.bdbzxx as bz,b.casj as cjsj,b.czr as cjr,
+            CASE t.bfzt WHEN 1 THEN '待复核' WHEN 2 THEN '拨付中' WHEN 3 THEN '拨付失败' WHEN 4 THEN '已拨付' WHEN 5 THEN '录入失败' WHEN 6 THEN '工资代发' END AS bfzt,
+            '' as sfsc,'' as htfj,'' as tdbcmxpc,t.seqno as dealno,c.xmmc,'' as szzw,'' as lsx,'' as lsxz,t.ssxzjc as lsc,'' as sfxx
+            FROM
+                cet_zj_lwrygz_lwry t
+                LEFT JOIN cet_zj_lwrygz b ON t.CET_ZJ_LWRYGZ_ID = b.id
+            LEFT JOIN cet_xm_xmjbxx c ON b.xmxx = c.id 
+            WHERE 1=1 
+            AND t.xm = '{name}'                         #姓名	
+            AND t.sfzhm = '{idCard}'                  #身份证号	
+            AND t.id = {assetId}                           #资产ID
+
 ";
         }
     }
